@@ -34,25 +34,21 @@ class Sql
 
     static function insertDummyUsers()
     {
-        $hash1 = Hash::make(bin2hex(openssl_random_pseudo_bytes(2)));
-        $hash2 = Hash::make('bobdylan');
-        $hash3 = Hash::make('liverpool');
+        # generate random pass for admin user, from 12-19 chars long so bruteforcing will be discuraged
+        $admin_pass = base64_encode(openssl_random_pseudo_bytes(rand(12, 19)));
+        $hash1 = Hash::make($admin_pass);
 
         $q1 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('admin', '$hash1', 1, 'admin', 'homebase', '9090')";
-        $q2 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('bob', '$hash2', 1, 'Robert Green', 'Greenland Grove 9', '2010')";
-        $q3 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('bjarni', '$hash3', 1, 'Bjarni Torgmund', 'Hummerdale 12', '4120')";
 
         self::$pdo->exec($q1);
-        self::$pdo->exec($q2);
-        self::$pdo->exec($q3);
 
-
+        print "[tdt4237] Auto-generated admin user pass is: ".$admin_pass.PHP_EOL;
         print "[tdt4237] Done inserting dummy users.".PHP_EOL;
     }
 
     static function insertPosts() {
-        $q4 = "INSERT INTO posts(author, date, title, content) VALUES ('bob', '26082015', 'I have a problem', 'I have a generic problem I think its embarrasing to talk about. Someone help?')";
-        $q5 = "INSERT INTO posts(author, date, title, content) VALUES ('bjarni', '26082015', 'I also have a problem', 'I generally fear very much for my health')";
+        $q4 = "INSERT INTO posts(author, date, title, content) VALUES ('admin', '26082015', 'I have a problem', 'I have a generic problem I think its embarrasing to talk about. Someone help?')";
+        $q5 = "INSERT INTO posts(author, date, title, content) VALUES ('admin', '26082015', 'I also have a problem', 'I generally fear very much for my health')";
 
         self::$pdo->exec($q4);
         self::$pdo->exec($q5);
@@ -61,8 +57,8 @@ class Sql
     }
 
     static function insertComments() {
-        $q1 = "INSERT INTO comments(author, date, text, belongs_to_post) VALUES ('bjarni', '26082015', 'Don''t be shy! No reason to be afraid here',0)";
-        $q2 = "INSERT INTO comments(author, date, text, belongs_to_post) VALUES ('bob', '26082015', 'I wouldn''t worry too much, really. Just relax!',1)";
+        $q1 = "INSERT INTO comments(author, date, text, belongs_to_post) VALUES ('admin', '26082015', 'Don''t be shy! No reason to be afraid here',0)";
+        $q2 = "INSERT INTO comments(author, date, text, belongs_to_post) VALUES ('admin', '26082015', 'I wouldn''t worry too much, really. Just relax!',1)";
         self::$pdo->exec($q1);
         self::$pdo->exec($q2);
         print "[tdt4237] Done inserting comments.".PHP_EOL;
