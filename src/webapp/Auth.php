@@ -88,9 +88,8 @@ class Auth
 
     public function logout()
     {
-        if($this->guest()) {
-            session_destroy();
-        }
+        session_destroy();
+        
     }
 
 }
