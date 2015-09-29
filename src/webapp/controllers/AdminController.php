@@ -33,6 +33,12 @@ class AdminController extends Controller
 
     public function delete($username)
     {
+
+        if (! $this->auth->isAdmin()) {
+            $this->app->flash('info', "You must be administrator to view the admin page.");
+            $this->app->redirect('/');
+        }
+
         if ($this->userRepository->deleteByUsername($username) === 1) {
             $this->app->flash('info', "Sucessfully deleted '$username'");
             $this->app->redirect('/admin');
@@ -45,6 +51,12 @@ class AdminController extends Controller
 
     public function deletePost($postId)
     {
+
+        if (! $this->auth->isAdmin()) {
+            $this->app->flash('info', "You must be administrator to view the admin page.");
+            $this->app->redirect('/');
+        }
+
         if ($this->postRepository->deleteByPostid($postId) === 1) {
             $this->app->flash('info', "Sucessfully deleted '$postId'");
             $this->app->redirect('/admin');
