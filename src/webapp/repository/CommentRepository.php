@@ -34,7 +34,9 @@ class CommentRepository
         if ($comment->getCommentId() === null) {
             $query = "INSERT INTO comments (author, text, date, belongs_to_post) "
                 . "VALUES ('$author', '$text', '$date', '$postid')";
-            return $this->db->exec($query);
+
+            return $this->injectionFix($query);
+            //return $this->db->exec($query);
         }
     }
 
@@ -56,5 +58,13 @@ class CommentRepository
             ->setText($row['text'])
             ->setDate($row['date'])
             ->setPost($row['belongs_to_post']);
+    }
+
+    private function injectionFix($query)
+    {
+        //Protecting against injections
+        $pdoStatement = $this->db->prepare($query);
+
+        return $pdoStatement->execute();
     }
 }

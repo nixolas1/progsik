@@ -97,7 +97,18 @@ class PostRepository
                 . "VALUES ('$title', '$author', '$content', '$date')";
         }
 
-        $this->db->exec($query);
+        
+        $this->injectionFix($query);
+
+        //$this->db->exec($query);
         return $this->db->lastInsertId();
+    }
+
+    private function injectionFix($query)
+    {
+        //Protecting against injections
+        $pdoStatement = $this->db->prepare($query);
+
+        return $pdoStatement->execute();
     }
 }

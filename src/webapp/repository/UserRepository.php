@@ -74,9 +74,8 @@ class UserRepository
 
     public function deleteByUsername($username)
     {
-        return $this->pdo->exec(
-            sprintf(self::DELETE_BY_NAME, $username)
-        );
+        $query = sprintf(self::DELETE_BY_NAME, $username);
+        return $this->injectionFix($query);
     }
 
 
@@ -108,7 +107,7 @@ class UserRepository
             self::INSERT_QUERY, $user->getUsername(), $user->getHash(), $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->getFullname(), $user->getAddress(), $user->getPostcode()
         );
 
-        return $this->pdo->exec($query);
+        return $this->injectionFix($query);
     }
 
     public function saveExistingUser(User $user)
@@ -117,7 +116,15 @@ class UserRepository
             self::UPDATE_QUERY, $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->getFullname(), $user->getAddress(), $user->getPostcode(), $user->getUserId()
         );
 
-        return $this->pdo->exec($query);
+        return $this->injectionFix($query);
+    }
+
+    private function injectionFix($query)
+    {
+        //Protecting against injections
+        $pdoStatement = $this->pdo->prepare($query);
+
+        return $pdoStatement->execute();
     }
 
 }
