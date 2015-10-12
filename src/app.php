@@ -64,11 +64,8 @@ $app->get('/user/edit', $ns . 'UserController:showUserEditForm')->name('editprof
 $app->post('/user/edit', $ns . 'UserController:receiveUserEditForm');
 
 // Forgot password
-$app->get('/forgot/:username', $ns . 'ForgotPasswordController:confirmForm');
 $app->get('/forgot', $ns . 'ForgotPasswordController:forgotPassword');
-
-$app->post('/forgot/:username', $ns . 'ForgotPasswordController:confirm');
-$app->post('/forgot', $ns . 'ForgotPasswordController:submitName');
+$app->post('/forgot', $ns . 'ForgotPasswordController:confirm');
 
 // Show a user by name
 $app->get('/user/:username', $ns . 'UserController:show')->name('showuser');
