@@ -34,19 +34,18 @@ class AdminController extends Controller
     public function delete($username)
     {
 
-        if (! $this->auth->isAdmin()) {
+        if ($this->auth->isAdmin()) {
+            if ($this->userRepository->deleteByUsername($username) === 1) {
+                $this->app->flash('info', "Sucessfully deleted '$username'");
+                $this->app->redirect('/admin');
+            } else {
+                $this->app->flash('info', "An error ocurred. Unable to delete user '$username'.");
+                $this->app->redirect('/admin');
+            }
+        } else {
             $this->app->flash('info', "You must be administrator to view the admin page.");
             $this->app->redirect('/');
         }
-
-        if ($this->userRepository->deleteByUsername($username) === 1) {
-            $this->app->flash('info', "Sucessfully deleted '$username'");
-            $this->app->redirect('/admin');
-            return;
-        }
-        
-        $this->app->flash('info', "An error ocurred. Unable to delete user '$username'.");
-        $this->app->redirect('/admin');
     }
 
     public function deletePost($postId)
@@ -55,13 +54,12 @@ class AdminController extends Controller
             if ($this->postRepository->deleteByPostid($postId) === 1) {
                 $this->app->flash('info', "Sucessfully deleted '$postId'");
                 $this->app->redirect('/admin');
-                return;
+            } else {
+                $this->app->flash('info', "An error ocurred. Unable to delete user '$username'.");
+                $this->app->redirect('/admin');
             }
-
-            $this->app->flash('info', "An error ocurred. Unable to delete user '$username'.");
-            $this->app->redirect('/admin');
         } else {
-            $this->app->flash('info', "An error ocurred. Unable to verify admin rights.");
+            $this->app->flash('info', "You must be administrator to view the admin page.");
             $this->app->redirect('/');
         }
     }
