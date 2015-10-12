@@ -20,7 +20,7 @@ class Sql
         $q1 = "CREATE TABLE users (
             id INTEGER PRIMARY KEY, 
             user VARCHAR(50) NOT NULL UNIQUE, 
-            pass VARCHAR(50) NOT NULL, 
+            pass VARCHAR(256) NOT NULL, 
             email varchar(50) default null, 
             fullname varchar(50), 
             address varchar(50), 
