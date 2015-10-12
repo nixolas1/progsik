@@ -25,7 +25,11 @@ class PostController extends Controller
     }
 
     public function show($postId)
-    {
+    {   
+        /*only logged in users should be able to browse posts*/
+        if (!$this->auth->check()) {
+            $this->app->redirect("/");
+        }
         $post = $this->postRepository->find($postId);
         $comments = $this->commentRepository->findByPostId($postId);
         $request = $this->app->request;
