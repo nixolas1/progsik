@@ -51,19 +51,18 @@ class AdminController extends Controller
 
     public function deletePost($postId)
     {
+        if ($this->auth->isAdmin()) {
+            if ($this->postRepository->deleteByPostid($postId) === 1) {
+                $this->app->flash('info', "Sucessfully deleted '$postId'");
+                $this->app->redirect('/admin');
+                return;
+            }
 
-        if (! $this->auth->isAdmin()) {
-            $this->app->flash('info', "You must be administrator to view the admin page.");
+            $this->app->flash('info', "An error ocurred. Unable to delete user '$username'.");
+            $this->app->redirect('/admin');
+        } else {
+            $this->app->flash('info', "An error ocurred. Unable to verify admin rights.");
             $this->app->redirect('/');
         }
-
-        if ($this->postRepository->deleteByPostid($postId) === 1) {
-            $this->app->flash('info', "Sucessfully deleted '$postId'");
-            $this->app->redirect('/admin');
-            return;
-        }
-
-        $this->app->flash('info', "An error ocurred. Unable to delete user '$username'.");
-        $this->app->redirect('/admin');
     }
 }
