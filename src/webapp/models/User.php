@@ -16,6 +16,7 @@ class User
     protected $age;
     protected $bankcard;
     protected $isAdmin = 0;
+    protected $isDoctor = 0;
 
     function __construct($username, $hash, $fullname, $address, $postcode)
     {
@@ -56,6 +57,11 @@ class User
         return $this->age;
     }
 
+    public function getBanknumber()
+    {
+        return $this->age;
+    }
+
     public function getFullname() {
         return $this->fullname;
     }
@@ -82,9 +88,19 @@ class User
 
     }
 
+    public function setBanknumber($banknumber) {
+        $this->banknumber = $banknumber;
+
+    }
+
     public function isAdmin()
     {
         return $this->isAdmin === '1';
+    }
+
+    public function isDoctor()
+    {
+        return $this->isDoctor === '1';
     }
 
     public function setUserId($userId)
@@ -126,6 +142,12 @@ class User
     public function setIsAdmin($isAdmin)
     {
         $this->isAdmin = $isAdmin;
+        return $this;
+    }
+
+    public function setIsDoctor($isDoctor)
+    {
+        $this->isDoctor = $isDoctor;
         return $this;
     }
 

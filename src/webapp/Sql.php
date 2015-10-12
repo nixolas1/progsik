@@ -26,8 +26,11 @@ class Sql
             address varchar(50), 
             postcode varchar (4), 
             age varchar(50), 
-            bio varhar(50), 
-            isadmin INTEGER);";
+            bio varchar(50),
+            isadmin INTEGER,
+            isdoctor INTEGER,
+            banknumber varchar(15)
+            );";
         $q6 = "CREATE TABLE posts (
             postId INTEGER PRIMARY KEY AUTOINCREMENT, 
             author TEXT, title TEXT NOT NULL, 
@@ -83,7 +86,6 @@ class Sql
         self::$pdo->exec($q1);
         self::$pdo->exec($q2);
         print "[tdt4237] Done inserting comments.".PHP_EOL;
-
 
     }
 

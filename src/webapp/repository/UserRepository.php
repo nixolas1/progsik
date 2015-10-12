@@ -36,6 +36,8 @@ class UserRepository
         $user->setPostcode((($row['postcode'])));
         $user->setBio($row['bio']);
         $user->setIsAdmin($row['isadmin']);
+        $user->setIsDoctor($row['isdoctor']);
+        $user->setBanknumber($row['banknumber']);
 
         if (!empty($row['email'])) {
             $user->setEmail(new Email($row['email']));

@@ -6,9 +6,9 @@ class EditUserFormValidation
 {
     private $validationErrors = [];
     
-    public function __construct($email, $bio, $age)
+    public function __construct($email, $bio, $age, $banknumber)
     {
-        $this->validate($email, $bio, $age);
+        $this->validate($email, $bio, $age, $banknumber);
     }
     
     public function isGoodToGo()
@@ -21,11 +21,12 @@ class EditUserFormValidation
         return $this->validationErrors;
     }
 
-    private function validate($email, $bio, $age)
+    private function validate($email, $bio, $age, $banknumber)
     {
         $this->validateEmail($email);
         $this->validateAge($age);
         $this->validateBio($bio);
+        $this->validateBanknumber($banknumber);
     }
     
     private function validateEmail($email)
@@ -39,6 +40,13 @@ class EditUserFormValidation
     {
         if (! is_numeric($age) or $age < 0 or $age > 130) {
             $this->validationErrors[] = 'Age must be between 0 and 130.';
+        }
+    }
+
+    private function validateBanknumber($bank)
+    {
+        if (!empty($bank) && strlen($bank) < 11) {
+            $this->validationErrors[] = 'Bank number must be at least 11 numbers.';
         }
     }
 
