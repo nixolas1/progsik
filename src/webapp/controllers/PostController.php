@@ -110,6 +110,7 @@ class PostController extends Controller
             if ($this->auth->isPaying()) {
                 $cost = $request->post('cost');
             }
+            echo $cost;
             
 
             $validation = new PostValidation($title, $author, $content);

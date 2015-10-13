@@ -38,6 +38,7 @@ class UserRepository
         $user->setIsAdmin($row['isadmin']);
         $user->setIsDoctor($row['isdoctor']);
         $user->setBanknumber($row['banknumber']);
+        $user->setIsPaying('0');
 
         if (!empty($row['email'])) {
             $user->setEmail(new Email($row['email']));
@@ -48,7 +49,7 @@ class UserRepository
         }
         
         if (!empty($row['banknumber'])) {
-            $user->setIsPaying(1);
+            $user->setIsPaying('1');
         }
 
         return $user;
