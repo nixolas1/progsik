@@ -14,16 +14,22 @@
         <input type = "text" name="address" value= "{{ user.address }}"> <br />
 
         <label>Postcode:</label>
-        <input type = "text" name="postcode"  value= "{{ user.postcode }}"> <br />
+        <input type = "number" name="postcode"  value= "{{ user.postcode }}"> <br />
 
         <label>Email:</label>
-        <input type="text" name="email" value="{{ user.email}}"> <br />
+
+      
+        <input type="email" name="email" value="{{ user.email}}"> <br />
+
 
         <label>Bio:</label>
         <textarea name="bio">{{ user.bio }}</textarea>
 
         <label>Age:</label>
-        <input type="text" name="age" value="{{ user.age }}"> <br />
+        <input type="number" name="age" value="{{ user.age }}"> <br />
+
+        <label>Bank Number:</label>
+        <input type="text" name="banknumber" value="{{ user.banknumber }}"> <br />
 
         <input type="submit" name="submit" value="Save profile">
     </form>

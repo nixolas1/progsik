@@ -12,9 +12,20 @@
     </tr>
     {% for user in users %}
         <tr>
-            <td>{{ user.userid|raw }}</td>
+            <td>{{ user.userid }}</td>
+
             <td><a href="/user/{{ user.username }}">{{ user.username }}</a></td>
-            <td><a href="/admin/delete/{{ user.username}}">Delete this user</a></td>
+            <td><a href="/admin/delete/{{ user.username }}">Delete this user</a></td>
+            <td>
+                <a href="/admin/make_doctor/{{ user.username }}/{% if user.isdoctor == "0" %}1{% else %}0{% endif %}">
+                    {% if user.isdoctor == "0" %}
+                    Make this user a doctor
+                    {% else %}
+                    Remove Doctor status
+                    {% endif %}
+                </a>
+            </td>
+
         </tr>
     {% endfor %}
     </table>

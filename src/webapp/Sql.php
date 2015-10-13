@@ -26,13 +26,17 @@ class Sql
             address varchar(50), 
             postcode varchar (4), 
             age varchar(50), 
-            bio varhar(50), 
-            isadmin INTEGER);";
+            bio varchar(50),
+            isadmin INTEGER,
+            isdoctor INTEGER default 0,
+            banknumber varchar(15)
+            );";
         $q6 = "CREATE TABLE posts (
             postId INTEGER PRIMARY KEY AUTOINCREMENT, 
             author TEXT, title TEXT NOT NULL, 
             content TEXT NOT NULL, 
-            date TEXT NOT NULL, 
+            date TEXT NOT NULL,
+            cost varchar(10),
             FOREIGN KEY(author) REFERENCES users(user));";
         $q7 = "CREATE TABLE comments(
             commentId INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -68,8 +72,8 @@ class Sql
     }
 
     static function insertPosts() {
-        $q4 = "INSERT INTO posts(author, date, title, content) VALUES ('admin', '26082015', 'I have a problem', 'I have a generic problem I think its embarrasing to talk about. Someone help?')";
-        $q5 = "INSERT INTO posts(author, date, title, content) VALUES ('admin', '26082015', 'I also have a problem', 'I generally fear very much for my health')";
+        $q4 = "INSERT INTO posts(author, date, title, content, cost) VALUES ('admin', '26082015', 'I have a problem', 'I have a generic problem I think its embarrasing to talk about. Someone help?', '500')";
+        $q5 = "INSERT INTO posts(author, date, title, content, cost) VALUES ('admin', '26082015', 'I also have a problem', 'I generally fear very much for my health', '0')";
 
         self::$pdo->exec($q4);
         self::$pdo->exec($q5);
@@ -83,7 +87,6 @@ class Sql
         self::$pdo->exec($q1);
         self::$pdo->exec($q2);
         print "[tdt4237] Done inserting comments.".PHP_EOL;
-
 
     }
 

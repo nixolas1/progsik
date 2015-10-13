@@ -106,6 +106,11 @@ class PostController extends Controller
             $content = $request->post('content');
             $author = $_SESSION['user'];
             $date = date("dmY");
+            $cost = 0;
+            if ($this->auth->isPaying()) {
+                $cost = $request->post('cost');
+            }
+            
 
             $validation = new PostValidation($title, $author, $content);
             if ($validation->isGoodToGo() && $_SESSION['token'] == $request->post('token')) {
@@ -114,6 +119,7 @@ class PostController extends Controller
                 $post->setTitle($title);
                 $post->setContent($content);
                 $post->setDate($date);
+                $post->setCost($cost);
                 $savedPost = $this->postRepository->save($post);
                 $this->app->redirect('/posts/' . $savedPost . '?msg=Post succesfully posted');
             }else if($_SESSION['token'] != $request->post('token'))

@@ -48,6 +48,24 @@ class AdminController extends Controller
         }
     }
 
+    public function make_doctor($username, $isdoctor)
+    {
+
+        if ($this->auth->isAdmin() && ($isdoctor == "1" || $isdoctor == "0")) {
+            $ret = $this->userRepository->setIsDoctorByUsername($username, $isdoctor);
+            if ($ret === 1) {
+                $this->app->flash('info', "Sucessfully set $username's doctor status to ".$isdoctor);
+                $this->app->redirect('/admin');
+            } else {
+                $this->app->flash('info', "An error ocurred. Unable to set change '$username' as doctor ".$isdoctor);
+                $this->app->redirect('/admin');
+            }
+        } else {
+            $this->app->flash('info', "You must be administrator to view the admin page.");
+            $this->app->redirect('/');
+        }
+    }
+
     public function deletePost($postId)
     {
         if ($this->auth->isAdmin()) {

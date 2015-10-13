@@ -10,8 +10,8 @@ use tdt4237\webapp\models\User;
 
 class UserRepository
 {
-    const INSERT_QUERY   = "INSERT INTO users(user, pass, email, age, bio, isadmin, fullname, address, postcode) VALUES(?, ?, ? , ? , ?, ?, ?, ?, ?)";
-    const UPDATE_QUERY   = "UPDATE users SET email=?, age=?, bio=?, isadmin=?, fullname =?, address = ?, postcode = ? WHERE id=?";
+    const INSERT_QUERY   = "INSERT INTO users(user, pass, email, age, bio, isadmin, isdoctor, banknumber, fullname, address, postcode) VALUES(?, ?, ? , ? , ?, ?, ?, ?, ?, ?, ?)";
+    const UPDATE_QUERY   = "UPDATE users SET email=?, age=?, bio=?, isadmin=?, isdoctor=?, banknumber=?, fullname =?, address = ?, postcode = ? WHERE id=?";
     const FIND_BY_NAME   = "SELECT * FROM users WHERE user=?";
     const DELETE_BY_NAME = "DELETE FROM users WHERE user=?";
     const SELECT_ALL     = "SELECT * FROM users";
@@ -36,6 +36,8 @@ class UserRepository
         $user->setPostcode((($row['postcode'])));
         $user->setBio($row['bio']);
         $user->setIsAdmin($row['isadmin']);
+        $user->setIsDoctor($row['isdoctor']);
+        $user->setBanknumber($row['banknumber']);
 
         if (!empty($row['email'])) {
             $user->setEmail(new Email($row['email']));
@@ -43,6 +45,10 @@ class UserRepository
 
         if (!empty($row['age'])) {
             $user->setAge(new Age($row['age']));
+        }
+        
+        if (!empty($row['banknumber'])) {
+            $user->setIsPaying(1);
         }
 
         return $user;
@@ -81,6 +87,16 @@ class UserRepository
         return $query->execute(array($username));
     }
 
+    public function setIsDoctorByUsername($username, $isDoctor)
+    {
+        $user = $this->findByUser($username);
+        $user->setIsDoctor($isDoctor);
+        if($this->saveExistingUser($user)){
+            return 1;
+        }else{
+            return false;
+        }
+    }
 
 
     public function all()
@@ -106,10 +122,11 @@ class UserRepository
 
     public function saveNewUser(User $user)
     {
+
         $query = $this->db->prepare(self::INSERT_QUERY);
 
         return $query->execute(array(
-            $user->getUsername(), $user->getHash(), $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->getFullname(), $user->getAddress(), $user->getPostcode()
+            $user->getUsername(), $user->getHash(), $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->isDoctor(), $user->getBanknumber(), $user->getFullname(), $user->getAddress(), $user->getPostcode()
         ));
     }
 
@@ -118,7 +135,7 @@ class UserRepository
         $query = $this->db->prepare(self::UPDATE_QUERY);
 
         return $query->execute(array(
-            $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->getFullname(), $user->getAddress(), $user->getPostcode(), $user->getUserId()
+            $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->isDoctor(), $user->getBanknumber(), $user->getFullname(), $user->getAddress(), $user->getPostcode(), $user->getUserId()
         ));
     }
 }

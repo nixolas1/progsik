@@ -19,7 +19,7 @@ class PostRepository
         $this->db = $db;
     }
     
-    public static function create($id, $author, $title, $content, $date)
+    public static function create($id, $author, $title, $content, $date, $cost)
     {
         $post = new Post;
         
@@ -28,7 +28,8 @@ class PostRepository
             ->setAuthor($author)
             ->setTitle($title)
             ->setContent($content)
-            ->setDate($date);
+            ->setDate($date)
+            ->setCost($cost);
     }
 
     public function find($postId)
@@ -71,7 +72,8 @@ class PostRepository
             $row['author'],
             $row['title'],
             $row['content'],
-            $row['date']
+            $row['date'],
+            $row['cost']
         );
 
        //  $this->db = $db;
@@ -92,13 +94,14 @@ class PostRepository
         $author = $post->getAuthor();
         $content = $post->getContent();
         $date    = $post->getDate();
+        $cost    = $post->getCost();
 
         if ($post->getPostId() === null) {
-            $query = $this->db->prepare("INSERT INTO posts (title, author, content, date) "
-                . "VALUES (?, ?, ?, ?)");
+            $query = $this->db->prepare("INSERT INTO posts (title, author, content, date, cost) "
+                . "VALUES (?, ?, ?, ?, ?)");
         }
 
-        $query->execute(array($title, $author, $content, $date));
+        $query->execute(array($title, $author, $content, $date, $cost));
 
         return $this->db->lastInsertId();
     }
