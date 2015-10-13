@@ -12,6 +12,7 @@ class RegistrationFormValidation
     
     public function __construct($username, $password, $fullname, $address, $postcode)
     {
+        $this->app = \Slim\Slim::getInstance();
         return $this->validate($username, $password, $fullname, $address, $postcode);
     }
     
@@ -30,6 +31,14 @@ class RegistrationFormValidation
         if (empty($password)) {
             $this->validationErrors[] = 'Password cannot be empty';
         }
+        
+        if (strlen($password) > 72) {
+            $this->validationErrors[] = "Password cannot contain more than 72 characters";
+        }
+        
+        if (strlen($password) < 8) {
+            $this->validationErrors[] = "Password should have atleast 8 characters";
+        }
 
         if(empty($fullname)) {
             $this->validationErrors[] = "Please write in your full name";
@@ -46,9 +55,17 @@ class RegistrationFormValidation
         if (strlen($postcode) != "4") {
             $this->validationErrors[] = "Post code must be exactly four digits";
         }
+        
+        if (!ctype_digit($postcode)) {
+            $this->validationErrors[] = "Post code must be a number";
+        }
 
         if (preg_match('/^[A-Za-z0-9_]+$/', $username) === 0) {
             $this->validationErrors[] = 'Username can only contain letters and numbers';
+        }
+        
+        if ($this->app->userRepository->findByUser($username)) {
+            $this->validationErrors[] = 'Username already exist';
         }
     }
 }

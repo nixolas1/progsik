@@ -49,7 +49,7 @@ class UserController extends Controller
             return $this->app->redirect('/login');
         }
 
-        $errors = join("<br>\n", $validation->getValidationErrors());
+        $errors = $validation->getValidationErrors();
         $this->app->flashNow('error', $errors);
         $this->render('newUserForm.twig', ['username' => $username]);
     }

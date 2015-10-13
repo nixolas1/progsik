@@ -13,8 +13,6 @@ class CommentRepository
      */
     private $db;
 
-    const SELECT_BY_ID = "SELECT * FROM moviereviews WHERE id = %s";
-
     public function __construct(PDO $db)
     {
 
@@ -32,18 +30,21 @@ class CommentRepository
 
 
         if ($comment->getCommentId() === null) {
-            $query = "INSERT INTO comments (author, text, date, belongs_to_post) "
-                . "VALUES ('$author', '$text', '$date', '$postid')";
+            $query = $this->db->prepare("INSERT INTO comments (author, text, date, belongs_to_post) "
+                . "VALUES (?, ?, ?, ?)");
 
-            return $this->injectionFix($query);
-            //return $this->db->exec($query);
+            return $query->execute(array($author, $text, $date, $postid));
+
         }
     }
 
     public function findByPostId($postId)
     {
-        $query   = "SELECT * FROM comments WHERE belongs_to_post = $postId";
-        $rows = $this->db->query($query)->fetchAll();
+
+        $query   = $this->db->prepare("SELECT * FROM comments WHERE belongs_to_post = ?");
+        $query->execute(array($postId));
+
+        $rows = $query->fetchAll();
 
         return array_map([$this, 'makeFromRow'], $rows);
     }
@@ -55,16 +56,8 @@ class CommentRepository
         return $comment
             ->setCommentId($row['commentId'])
             ->setAuthor($row['author'])
-            ->setText($row['text'])
+            ->setText(htmlspecialchars_decode($row['text']))
             ->setDate($row['date'])
             ->setPost($row['belongs_to_post']);
-    }
-
-    private function injectionFix($query)
-    {
-        //Protecting against injections
-        $pdoStatement = $this->db->prepare($query);
-
-        return $pdoStatement->execute();
     }
 }

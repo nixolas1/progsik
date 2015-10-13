@@ -16,7 +16,7 @@ chmod(__DIR__ . '/../web/uploads', 0700);
 
 $app = new Slim([
     'templates.path' => __DIR__.'/webapp/templates/',
-    'debug' => true,
+    'debug' => false,
     'view' => new Twig()
 
 ]);
@@ -32,7 +32,7 @@ try {
     // Set errormode to exceptions
     $app->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    echo $e->getMessage();
+    //echo $e->getMessage();
     exit();
 }
 
@@ -64,11 +64,8 @@ $app->get('/user/edit', $ns . 'UserController:showUserEditForm')->name('editprof
 $app->post('/user/edit', $ns . 'UserController:receiveUserEditForm');
 
 // Forgot password
-$app->get('/forgot/:username', $ns . 'ForgotPasswordController:confirmForm');
 $app->get('/forgot', $ns . 'ForgotPasswordController:forgotPassword');
-
-$app->post('/forgot/:username', $ns . 'ForgotPasswordController:confirm');
-$app->post('/forgot', $ns . 'ForgotPasswordController:submitName');
+$app->post('/forgot', $ns . 'ForgotPasswordController:confirm');
 
 // Show a user by name
 $app->get('/user/:username', $ns . 'UserController:show')->name('showuser');
