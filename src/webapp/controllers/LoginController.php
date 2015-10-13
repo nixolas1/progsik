@@ -32,6 +32,7 @@ class LoginController extends Controller
 
         if ($this->auth->checkCredentials($user, $pass)) {
             $_SESSION['user'] = $user;
+            $_SESSION['token'] = md5(uniqid(mt_rand(), true));
             $isAdmin = $this->auth->user()->isAdmin();
 
 

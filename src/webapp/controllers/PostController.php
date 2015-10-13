@@ -50,7 +50,8 @@ class PostController extends Controller
         $this->render('showpost.twig', [
             'post' => $post,
             'comments' => $comments,
-            'flash' => $variables
+            'flash' => $variables,
+            'token' => $_SESSION['token']
         ]);
 
     }
@@ -60,13 +61,18 @@ class PostController extends Controller
 
         if(!$this->auth->guest()) {
 
-            $comment = new Comment();
-            $comment->setAuthor($_SESSION['user']);
-            $comment->setText($this->app->request->post("text"));
-            $comment->setDate(date("dmY"));
-            $comment->setPost($postId);
-            $this->commentRepository->save($comment);
-            $this->app->redirect('/posts/' . $postId);
+            if($_SESSION['token'] != $request->post('token')) {
+                $comment = new Comment();
+                $comment->setAuthor($_SESSION['user']);
+                $comment->setText($this->app->request->post("text"));
+                $comment->setDate(date("dmY"));
+                $comment->setPost($postId);
+                $this->commentRepository->save($comment);
+                $this->app->redirect('/posts/' . $postId);
+            }else {
+                $this->app->redirect('/' . $postId);
+                $this->app->flash('error', 'Tokens doesn\'t match.');
+            }
         }
         else {
             $this->app->redirect('/login');
@@ -80,7 +86,7 @@ class PostController extends Controller
 
         if ($this->auth->check()) {
             $username = $_SESSION['user'];
-            $this->render('createpost.twig', ['username' => $username]);
+            $this->render('createpost.twig', ['username' => $username, 'token' => $_SESSION['token']]);
         } else {
 
             $this->app->flash('error', "You need to be logged in to create a post");
@@ -102,7 +108,7 @@ class PostController extends Controller
             $date = date("dmY");
 
             $validation = new PostValidation($title, $author, $content);
-            if ($validation->isGoodToGo()) {
+            if ($validation->isGoodToGo() && $_SESSION['token'] == $request->post('token')) {
                 $post = new Post();
                 $post->setAuthor($author);
                 $post->setTitle($title);
@@ -110,6 +116,10 @@ class PostController extends Controller
                 $post->setDate($date);
                 $savedPost = $this->postRepository->save($post);
                 $this->app->redirect('/posts/' . $savedPost . '?msg=Post succesfully posted');
+            }else if($_SESSION['token'] != $request->post('token'))
+            {
+                $this->app->flash('error', 'Tokens doesn\'t match.');
+                $this->app->redirect('/');
             }
         }
 
