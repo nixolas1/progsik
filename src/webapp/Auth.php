@@ -85,6 +85,17 @@ class Auth
 
         throw new Exception('Not logged in but called Auth::isAdmin() anyway');
     }
+    
+    public function isPaying()
+    {
+        if ($this->check()) {
+            $user = $this->user();
+            if ($user != false) {
+                return $user->isPaying();
+            }
+            return false;
+        }
+    }
 
     public function logout()
     {
