@@ -35,7 +35,7 @@ class AdminController extends Controller
     {
 
         if ($this->auth->isAdmin()) {
-            if ($this->userRepository->deleteByUsername($username) == 1) {
+            if ($this->userRepository->deleteByUsername($username)) {
                 $this->app->flash('info', "Sucessfully deleted '$username'");
                 $this->app->redirect('/admin');
             } else {
@@ -51,7 +51,7 @@ class AdminController extends Controller
     public function deletePost($postId)
     {
         if ($this->auth->isAdmin()) {
-            if ($this->postRepository->deleteByPostid($postId) == 1) {
+            if ($this->postRepository->deleteByPostid($postId)) {
                 $this->app->flash('info', "Sucessfully deleted post with id '$postId'");
                 $this->app->redirect('/admin');
             } else {
