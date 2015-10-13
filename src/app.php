@@ -16,7 +16,7 @@ chmod(__DIR__ . '/../web/uploads', 0700);
 
 $app = new Slim([
     'templates.path' => __DIR__.'/webapp/templates/',
-    'debug' => true,
+    'debug' => false,
     'view' => new Twig()
 
 ]);
@@ -32,7 +32,7 @@ try {
     // Set errormode to exceptions
     $app->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    echo $e->getMessage();
+    //echo $e->getMessage();
     exit();
 }
 
