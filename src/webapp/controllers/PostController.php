@@ -61,7 +61,7 @@ class PostController extends Controller
 
         if(!$this->auth->guest()) {
 
-            if($_SESSION['token'] != $request->post('token')) {
+            if($_SESSION['token'] == $this->app->request->post('token')) {
                 $comment = new Comment();
                 $comment->setAuthor($_SESSION['user']);
                 $comment->setText($this->app->request->post("text"));
@@ -70,13 +70,13 @@ class PostController extends Controller
                 $this->commentRepository->save($comment);
                 $this->app->redirect('/posts/' . $postId);
             }else {
-                $this->app->redirect('/' . $postId);
                 $this->app->flash('error', 'Tokens doesn\'t match.');
+                $this->app->redirect('/');
             }
         }
         else {
-            $this->app->redirect('/login');
             $this->app->flash('info', 'you must log in to do that');
+            $this->app->redirect('/login');
         }
 
     }
