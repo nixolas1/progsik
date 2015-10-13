@@ -19,7 +19,7 @@ class PostRepository
         $this->db = $db;
     }
     
-    public static function create($id, $author, $title, $content, $date)
+    public static function create($id, $author, $title, $content, $date, $cost)
     {
         $post = new Post;
         
