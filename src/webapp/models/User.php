@@ -59,7 +59,7 @@ class User
 
     public function getBanknumber()
     {
-        return $this->age;
+        return $this->banknumber;
     }
 
     public function getFullname() {
