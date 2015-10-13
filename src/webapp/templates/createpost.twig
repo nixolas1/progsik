@@ -9,6 +9,10 @@
 
         <label>Title:</label>
         <input type = "text" name="title"> <br />
+        {% if isPaying %}
+        <label>Cost:</label>
+        <input type="text" name="cost">
+        {% endif %}
 
         <label>Text:</label>
         <textarea cols="40" rows="10" name="content"> </textarea><br />

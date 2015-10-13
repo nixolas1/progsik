@@ -44,6 +44,10 @@ class UserRepository
         if (!empty($row['age'])) {
             $user->setAge(new Age($row['age']));
         }
+        
+        if (!empty($row['banknumber'])) {
+            $user->setIsPaying(1);
+        }
 
         return $user;
     }

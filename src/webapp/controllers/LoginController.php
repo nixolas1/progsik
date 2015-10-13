@@ -33,12 +33,8 @@ class LoginController extends Controller
         if ($this->auth->checkCredentials($user, $pass)) {
             $_SESSION['user'] = $user;
             $_SESSION['token'] = md5(uniqid(mt_rand(), true));
-            $isAdmin = $this->auth->user()->isAdmin();
-
-
             $this->app->flash('info', "You are now successfully logged in as $user.");
             $this->app->redirect('/');
-            return;
         }
         
         $this->app->flashNow('error', 'Incorrect user/pass combination.');

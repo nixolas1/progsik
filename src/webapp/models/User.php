@@ -16,6 +16,7 @@ class User
     protected $age;
     protected $bankcard;
     protected $isAdmin = 0;
+    protected $isPaying = 0;
 
     function __construct($username, $hash, $fullname, $address, $postcode)
     {
@@ -86,6 +87,11 @@ class User
     {
         return $this->isAdmin === '1';
     }
+    
+    public function isPaying()
+    {
+        return $this->isPaying === '1';
+    }
 
     public function setUserId($userId)
     {
@@ -126,6 +132,12 @@ class User
     public function setIsAdmin($isAdmin)
     {
         $this->isAdmin = $isAdmin;
+        return $this;
+    }
+    
+    public function setIsPaying($isPaying)
+    {
+        $this->isPaying = $isPaying;
         return $this;
     }
 

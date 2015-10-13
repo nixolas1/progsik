@@ -15,6 +15,7 @@ class Post
     protected $title;
     protected $content;
     protected $date;
+    protected $cost;
 
 
     public function getPostId() {
@@ -61,6 +62,15 @@ class Post
 
     public function getTitle() {
         return $this->title;
+    }
+    
+    public function setCost($cost) {
+        $this->cost = $cost;
+        return $this;
+    }
+
+    public function getcost() {
+        return $this->cost;
     }
 
 
