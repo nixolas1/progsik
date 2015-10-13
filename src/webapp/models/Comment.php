@@ -50,7 +50,7 @@ class Comment
     }
 
     public function setText($text) {
-        $this->text = htmlspecialchars($text);
+        $this->text = $text;
         return $this;
     }
 

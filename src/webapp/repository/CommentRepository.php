@@ -56,7 +56,7 @@ class CommentRepository
         return $comment
             ->setCommentId($row['commentId'])
             ->setAuthor($row['author'])
-            ->setText(htmlspecialchars_decode($row['text']))
+            ->setText($row['text'])
             ->setDate($row['date'])
             ->setPost($row['belongs_to_post']);
     }
