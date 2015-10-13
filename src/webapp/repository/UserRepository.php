@@ -10,21 +10,21 @@ use tdt4237\webapp\models\User;
 
 class UserRepository
 {
-    const INSERT_QUERY   = "INSERT INTO users(user, pass, email, age, bio, isadmin, fullname, address, postcode) VALUES('%s', '%s', '%s' , '%s' , '%s', '%s', '%s', '%s', '%s')";
-    const UPDATE_QUERY   = "UPDATE users SET email='%s', age='%s', bio='%s', isadmin='%s', fullname ='%s', address = '%s', postcode = '%s' WHERE id='%s'";
-    const FIND_BY_NAME   = "SELECT * FROM users WHERE user='%s'";
-    const DELETE_BY_NAME = "DELETE FROM users WHERE user='%s'";
+    const INSERT_QUERY   = "INSERT INTO users(user, pass, email, age, bio, isadmin, fullname, address, postcode) VALUES(?, ?, ? , ? , ?, ?, ?, ?, ?)";
+    const UPDATE_QUERY   = "UPDATE users SET email=?, age=?, bio=?, isadmin=?, fullname =?, address = ?, postcode = ? WHERE id=?";
+    const FIND_BY_NAME   = "SELECT * FROM users WHERE user=?";
+    const DELETE_BY_NAME = "DELETE FROM users WHERE user=?";
     const SELECT_ALL     = "SELECT * FROM users";
-    const FIND_FULL_NAME   = "SELECT * FROM users WHERE user='%s'";
+    const FIND_FULL_NAME   = "SELECT * FROM users WHERE user=?";
 
     /**
      * @var PDO
      */
-    private $pdo;
+    private $db;
 
-    public function __construct(PDO $pdo)
+    public function __construct(PDO $db)
     {
-        $this->pdo = $pdo;
+        $this->db = $db;
     }
 
     public function makeUserFromRow(array $row)
@@ -50,19 +50,21 @@ class UserRepository
 
     public function getNameByUsername($username)
     {
-        $query = sprintf(self::FIND_FULL_NAME, $username);
-
-        $result = $this->pdo->query($query, PDO::FETCH_ASSOC);
-        $row = $result->fetch();
+        $query = $this->db->prepare(self::FIND_FULL_NAME);
+        $query->execute(array($username));
+        //$result = $this->db->query($query, PDO::FETCH_ASSOC);
+        $row = $query->fetch();
         return $row['fullname'];
 
     }
 
     public function findByUser($username)
     {
-        $query  = sprintf(self::FIND_BY_NAME, $username);
-        $result = $this->pdo->query($query, PDO::FETCH_ASSOC);
-        $row = $result->fetch();
+        $query  = $this->db->prepare(self::FIND_BY_NAME);
+
+        $query->execute(array($username));
+        //$result = $this->pdo->query($query, PDO::FETCH_ASSOC);
+        $row = $query->fetch();
         
         if ($row === false) {
             return false;
@@ -74,15 +76,16 @@ class UserRepository
 
     public function deleteByUsername($username)
     {
-        $query = sprintf(self::DELETE_BY_NAME, $username);
-        return $this->injectionFix($query);
+        $query = $this->db->prepare(self::DELETE_BY_NAME);
+
+        return $query->execute(array($username));
     }
 
 
 
     public function all()
     {
-        $rows = $this->pdo->query(self::SELECT_ALL);
+        $rows = $this->db->query(self::SELECT_ALL);
         
         if ($rows === false) {
             return [];
@@ -103,28 +106,19 @@ class UserRepository
 
     public function saveNewUser(User $user)
     {
-        $query = sprintf(
-            self::INSERT_QUERY, $user->getUsername(), $user->getHash(), $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->getFullname(), $user->getAddress(), $user->getPostcode()
-        );
+        $query = $this->db->prepare(self::INSERT_QUERY);
 
-        return $this->injectionFix($query);
+        return $query->execute(array(
+            $user->getUsername(), $user->getHash(), $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->getFullname(), $user->getAddress(), $user->getPostcode()
+        ));
     }
 
     public function saveExistingUser(User $user)
     {
-        $query = sprintf(
-            self::UPDATE_QUERY, $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->getFullname(), $user->getAddress(), $user->getPostcode(), $user->getUserId()
-        );
+        $query = $this->db->prepare(self::UPDATE_QUERY);
 
-        return $this->injectionFix($query);
+        return $query->execute(array(
+            $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->getFullname(), $user->getAddress(), $user->getPostcode(), $user->getUserId()
+        ));
     }
-
-    private function injectionFix($query)
-    {
-        //Protecting against injections
-        $pdoStatement = $this->pdo->prepare($query);
-
-        return $pdoStatement->execute();
-    }
-
 }

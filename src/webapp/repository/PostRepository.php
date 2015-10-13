@@ -33,14 +33,13 @@ class PostRepository
 
     public function find($postId)
     {
-        $sql  = "SELECT * FROM posts WHERE postId = $postId";
-        $result = $this->db->query($sql);
-        $row = $result->fetch();
+        $sql  = $this->db->prepare("SELECT * FROM posts WHERE postId = ?");
+        $sql->execute(array($postId));
+        $row = $sql->fetch();
 
         if($row === false) {
             return false;
         }
-
 
         return $this->makeFromRow($row);
     }
@@ -80,8 +79,10 @@ class PostRepository
 
     public function deleteByPostid($postId)
     {
-        return $this->db->exec(
-            sprintf("DELETE FROM posts WHERE postid='%s';", $postId));
+        $query = $this->db->prepare("DELETE FROM posts WHERE postid=?");
+        return $query->execute(array($postId));
+        //return $this->db->exec(
+        //    sprintf("DELETE FROM posts WHERE postid='%s';", $postId));
     }
 
 
@@ -93,22 +94,12 @@ class PostRepository
         $date    = $post->getDate();
 
         if ($post->getPostId() === null) {
-            $query = "INSERT INTO posts (title, author, content, date) "
-                . "VALUES ('$title', '$author', '$content', '$date')";
+            $query = $this->db->prepare("INSERT INTO posts (title, author, content, date) "
+                . "VALUES (?, ?, ?, ?)");
         }
 
-        
-        $this->injectionFix($query);
+        $query->execute(array($title, $author, $content, $date));
 
-        //$this->db->exec($query);
         return $this->db->lastInsertId();
-    }
-
-    private function injectionFix($query)
-    {
-        //Protecting against injections
-        $pdoStatement = $this->db->prepare($query);
-
-        return $pdoStatement->execute();
     }
 }

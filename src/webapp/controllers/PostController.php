@@ -20,7 +20,9 @@ class PostController extends Controller
     {
         $posts = $this->postRepository->all();
 
-        $posts->sortByDate();
+        if(!isempty($posts)){
+            $posts->sortByDate();
+        }
         $this->render('posts.twig', ['posts' => $posts]);
     }
 
@@ -107,7 +109,7 @@ class PostController extends Controller
                 $post->setContent($content);
                 $post->setDate($date);
                 $savedPost = $this->postRepository->save($post);
-                $this->app->redirect('/posts/' . $savedPost . '?msg="Post succesfully posted');
+                $this->app->redirect('/posts/' . $savedPost . '?msg=Post succesfully posted');
             }
         }
 
