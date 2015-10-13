@@ -48,15 +48,16 @@ class AdminController extends Controller
         }
     }
 
-    public function make_doctor($username)
+    public function make_doctor($username, $isdoctor)
     {
 
-        if ($this->auth->isAdmin()) {
-            if ($this->userRepository->setIsDoctorByUsername($username, True) === 1) {
-                $this->app->flash('info', "Sucessfully made '$username' a doctor.");
+        if ($this->auth->isAdmin() && ($isdoctor == "1" || $isdoctor == "0")) {
+            $ret = $this->userRepository->setIsDoctorByUsername($username, $isdoctor);
+            if ($ret === 1) {
+                $this->app->flash('info', "Sucessfully set $username's doctor status to ".$isdoctor);
                 $this->app->redirect('/admin');
             } else {
-                $this->app->flash('info', "An error ocurred. Unable to delete user '$username'.");
+                $this->app->flash('info', "An error ocurred. Unable to set change '$username' as doctor ".$isdoctor);
                 $this->app->redirect('/admin');
             }
         } else {

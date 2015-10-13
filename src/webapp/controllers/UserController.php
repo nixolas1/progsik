@@ -69,19 +69,23 @@ class UserController extends Controller
 
         } else {
             $user = $this->userRepository->findByUser($username);
+            if($user != false){
+                if ($this->auth->isAdmin() || $user->getUsername() == $this->auth->getUsername()) {
 
-            if ($user != false && $user->getUsername() == $this->auth->getUsername()) {
+                    $this->render('showuser.twig', [
+                        'user' => $user,
+                        'username' => $username
+                    ]);
+                } else if ($this->auth->check()) {
 
-                $this->render('showuser.twig', [
-                    'user' => $user,
-                    'username' => $username
-                ]);
-            } else if ($this->auth->check()) {
-
-                $this->render('showuserlite.twig', [
-                    'user' => $user,
-                    'username' => $username
-                ]);
+                    $this->render('showuserlite.twig', [
+                        'user' => $user,
+                        'username' => $username
+                    ]);
+                }
+            }else{
+                $this->app->flash("info", "Invalid user");
+                $this->app->redirect("/");
             }
         }
     }

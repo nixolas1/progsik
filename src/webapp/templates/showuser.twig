@@ -37,6 +37,12 @@
             <th>Age:</th>
             <td>{{ user.age }}</td>
             <tr></tr>
+            <th>Banknumber:</th>
+            <td>{{ user.banknumber }}</td>
+            <tr></tr>
+            <th>Is doctor:</th>
+            <td>{{ user.isDoctor }}</td>
+            <tr></tr>
     </table>
 {% else %}
     Could not find a user with username "{{ username|raw }}".

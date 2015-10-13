@@ -28,7 +28,7 @@ class Sql
             age varchar(50), 
             bio varchar(50),
             isadmin INTEGER,
-            isdoctor INTEGER,
+            isdoctor INTEGER default 0,
             banknumber varchar(15)
             );";
         $q6 = "CREATE TABLE posts (

@@ -14,7 +14,7 @@ class User
     protected $email   = null;
     protected $bio     = 'Bio is empty.';
     protected $age;
-    protected $bankcard;
+    protected $banknumber;
     protected $isAdmin = 0;
     protected $isDoctor = 0;
 
@@ -100,7 +100,7 @@ class User
 
     public function isDoctor()
     {
-        return $this->isDoctor === '1';
+        return $this->isDoctor == '1';
     }
 
     public function setUserId($userId)

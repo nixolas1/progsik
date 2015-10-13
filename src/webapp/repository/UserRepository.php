@@ -80,6 +80,16 @@ class UserRepository
         return $this->injectionFix($query);
     }
 
+    public function setIsDoctorByUsername($username, $isDoctor)
+    {
+        $user = $this->findByUser($username);
+        $user->setIsDoctor($isDoctor);
+        if($this->saveExistingUser($user)){
+            return 1;
+        }else{
+            return false;
+        }
+    }
 
 
     public function all()
