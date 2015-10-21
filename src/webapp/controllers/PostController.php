@@ -77,6 +77,7 @@ class PostController extends Controller
                 if($this->auth->isDoctor())
                 {
                     $doctor = $this->auth->getUsername();
+                    $this->postRepository->update_answered($postId, $doctor);
                 }else {
                     $doctor = NULL;
                 }
@@ -86,7 +87,6 @@ class PostController extends Controller
                 $comment->setDate(date("dmY"));
                 $comment->setPost($postId);
                 $this->commentRepository->save($comment);
-                $this->postRepository->update_answered($postId, $doctor);
                 $this->app->redirect('/posts/' . $postId);
             }else {
                 $this->app->flash('error', 'Tokens doesn\'t match.');
