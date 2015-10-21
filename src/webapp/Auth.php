@@ -97,10 +97,20 @@ class Auth
         }
     }
 
+    public function isDoctor()
+    {
+        if ($this->check()) {
+            $user = $this->user();
+            if ($user != false) {
+                return $user->isDoctor();
+            }
+            return false;
+        }
+    }
+
     public function logout()
     {
         session_destroy();
-        
     }
 
 }

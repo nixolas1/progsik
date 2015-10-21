@@ -18,8 +18,13 @@ class PostController extends Controller
 
     public function index()
     {
-        $posts = $this->postRepository->all();
 
+        if($this->auth->isDoctor()) {
+            $posts = $this->postRepository->paying();
+        } else {
+            $posts = $this->postRepository->all();
+        }
+        
         if(!isempty($posts)){
             $posts->sortByDate();
         }
@@ -43,9 +48,6 @@ class PostController extends Controller
             $variables['msg'] = $message;
 
         }
-
-
-
 
         $this->render('showpost.twig', [
             'post' => $post,

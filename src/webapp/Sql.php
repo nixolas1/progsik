@@ -62,10 +62,13 @@ class Sql
         # generate random pass for admin user, from 12-19 chars long so bruteforcing will be discuraged
         $admin_pass = base64_encode(openssl_random_pseudo_bytes(rand(12, 19)));
         $hash1 = Hash::make($admin_pass);
-
+        $hash2 = Hash::make("Testuser123");
         $q1 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('admin', '$hash1', 1, 'admin', 'homebase', '9090')";
-
+        $qTest = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('testuser', '$hash2', 1, 'admin', 'homebase', '9090')";
+        
         self::$pdo->exec($q1);
+        self::$pdo->exec($qTest);
+
 
         print "[tdt4237] Auto-generated admin user pass is: ".$admin_pass.PHP_EOL;
         print "[tdt4237] Done inserting dummy users.".PHP_EOL;

@@ -45,14 +45,13 @@ class PostRepository
         return $this->makeFromRow($row);
     }
 
-    public function all()
+    private function fetchPosts($sql)
     {
-        $sql   = "SELECT * FROM posts";
         $results = $this->db->query($sql);
 
         if($results === false) {
             return [];
-            throw new \Exception('PDO error in posts all()');
+            throw new \Exception('PDO error in posts paying()');
         }
 
         $fetch = $results->fetchAll();
@@ -63,6 +62,23 @@ class PostRepository
         return new PostCollection(
             array_map([$this, 'makeFromRow'], $fetch)
         );
+    }
+
+    public function all()
+    {
+        $sql   = "SELECT * FROM posts";
+
+        return $this->fetchPosts($sql);
+    }
+
+    public function paying()
+    {
+        $sql = "SELECT *
+                FROM posts, users
+                WHERE posts.cost > 0
+                AND users.banknumber != ''";
+
+        return $this->fetchPosts($sql);
     }
 
     public function makeFromRow($row)
