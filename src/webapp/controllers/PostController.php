@@ -108,12 +108,10 @@ class PostController extends Controller
             $content = $request->post('content');
             $author = $_SESSION['user'];
             $date = date("dmY");
-            $cost = 0;
+            $cost = "0";
             if ($this->auth->isPaying()) {
                 $cost = $request->post('cost');
             }
-            echo $cost;
-            
 
             $validation = new PostValidation($title, $author, $content);
             if ($validation->isGoodToGo() && $_SESSION['token'] == $request->post('token')) {
