@@ -55,6 +55,14 @@ class PostRepository
         return $this->makeFromRow($row);
     }
 
+    public function getTotalCompanyEarned()
+    {
+        $post_cost = 3;
+        $count_answered_by_doctor = count($this->payedAndAnswered());
+        $total = $post_cost * $count_answered_by_doctor;
+        return $total;
+    }
+
     private function fetchPosts($sql)
     {
         $results = $this->db->query($sql);

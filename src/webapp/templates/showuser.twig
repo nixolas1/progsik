@@ -42,10 +42,21 @@
             <tr></tr>
             <th>Is doctor:</th>
             <td>{{ user.isDoctor }}</td>
-            
+            <tr></tr>
+            {% if user.isDoctor %}
+            <th>Total earned:</th>
+            <td>{{user.earned}}</td>
+            <tr></tr>
+            {% endif %}
+            {% if user.isAdmin %}
+            <th>Company has earned:</th>
+            <td>{{earned_company}}</td>
+            <tr></tr>
+            {% endif %}
             {% if user.isPaying %}
             <th>Total spent:</th>
-            <td>{{user.cost}}</td>
+            <td>{{user.spent}}</td>
+            <tr></tr>
             {% endif %}
             
             
