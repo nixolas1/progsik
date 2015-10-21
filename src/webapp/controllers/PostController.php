@@ -18,17 +18,27 @@ class PostController extends Controller
 
     public function index()
     {
-
-        if($this->auth->isDoctor()) {
-            $posts = $this->postRepository->paying();
+        $postsAnswered;
+        if($this->auth->isDoctor() == 1) {
+            $postsArray     = $this->postRepository->paying();
+            $posts          = $postsArray[0];
+            $postsAnswered  = $postsArray[1];
         } else {
-            $posts = $this->postRepository->all();
+            $postsArray     = $this->postRepository->all($this->auth->getUsername());
+            $posts          = $postsArray[0];
+            $postsAnswered  = $postsArray[1];
         }
         
-        if(!isempty($posts)){
+        if(!empty($posts)){
             $posts->sortByDate();
         }
-        $this->render('posts.twig', ['posts' => $posts]);
+        if(!empty($postsAnswered)){
+            $postsAnswered->sortByDate();
+            $this->render('posts.twig', ['postsAnswered' => $postsAnswered, 'posts' => $posts]);
+        } else {
+            $this->render('posts.twig', ['posts' => $posts]);
+        }   
+
     }
 
     public function show($postId)
@@ -64,12 +74,19 @@ class PostController extends Controller
         if(!$this->auth->guest()) {
 
             if($_SESSION['token'] == $this->app->request->post('token')) {
+                if($this->auth->isDoctor())
+                {
+                    $doctor = $this->auth->getUsername();
+                }else {
+                    $doctor = NULL;
+                }
                 $comment = new Comment();
                 $comment->setAuthor($_SESSION['user']);
                 $comment->setText($this->app->request->post("text"));
                 $comment->setDate(date("dmY"));
                 $comment->setPost($postId);
                 $this->commentRepository->save($comment);
+                $this->postRepository->update_answered($postId, $doctor);
                 $this->app->redirect('/posts/' . $postId);
             }else {
                 $this->app->flash('error', 'Tokens doesn\'t match.');

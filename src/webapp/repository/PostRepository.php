@@ -64,9 +64,25 @@ class PostRepository
         );
     }
 
-    public function all()
+    public function all($user)
     {
-        $sql   = "SELECT * FROM posts";
+        $sql   = "SELECT * 
+                FROM posts, users
+                WHERE posts.cost <= 0
+                OR (posts.cost <= 0 AND users.user == '$user'
+                    )
+                GROUP BY posts.postId";
+
+        $q1 = $this->fetchPosts($sql);
+        $q2 = $this->payedAndAnswered();
+
+        return array($q1, $q2);
+    }
+
+    public function allPosts()
+    {
+        $sql   = "SELECT * 
+                FROM posts";
 
         return $this->fetchPosts($sql);
     }
@@ -75,10 +91,37 @@ class PostRepository
     {
         $sql = "SELECT *
                 FROM posts, users
-                WHERE posts.cost > 0
-                AND users.banknumber != ''";
+                WHERE posts.cost == 1
+                AND users.banknumber != ''
+                AND posts.postId NOT IN
+                    (SELECT belongs_to_post
+                    FROM comments
+                    WHERE comments.author IN (
+                        SELECT user
+                        FROM users
+                        WHERE isdoctor == 1))
+                GROUP BY posts.postId";
 
+        return array($this->fetchPosts($sql), $this->payedAndAnswered());
+    }
+
+    public function payedAndAnswered()
+    {
+        $sql = "SELECT distinct *
+                FROM posts, users
+                WHERE posts.cost == 1
+                AND users.banknumber != ''
+                AND posts.answered != ''
+                GROUP BY posts.postId";
         return $this->fetchPosts($sql);
+    }
+
+    public function update_answered($postId, $doctor)
+    {
+        $query = $this->db->exec("UPDATE posts
+                SET answered='$doctor'
+                WHERE posts.postId == '$postId'");
+
     }
 
     public function makeFromRow($row)

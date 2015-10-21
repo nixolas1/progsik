@@ -26,7 +26,7 @@ class AdminController extends Controller
 
         $variables = [
             'users' => $this->userRepository->all(),
-            'posts' => $this->postRepository->all()
+            'posts' => $this->postRepository->allPosts()
         ];
         $this->render('admin.twig', $variables);
     }

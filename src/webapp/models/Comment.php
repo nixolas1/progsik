@@ -15,6 +15,7 @@ class Comment
     protected $text;
     protected $date;
     protected $belongs_to_post;
+    protected $doctor;
 
 
     public function getCommentId() {
@@ -63,10 +64,5 @@ class Comment
         return $this;
 
     }
-
-
-
-
-
 
 }

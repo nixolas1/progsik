@@ -37,6 +37,7 @@ class Sql
             content TEXT NOT NULL, 
             date TEXT NOT NULL,
             cost varchar(10),
+            answered VARCHAR(50) NULL,
             FOREIGN KEY(author) REFERENCES users(user));";
         $q7 = "CREATE TABLE comments(
             commentId INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -75,8 +76,8 @@ class Sql
     }
 
     static function insertPosts() {
-        $q4 = "INSERT INTO posts(author, date, title, content, cost) VALUES ('admin', '26082015', 'I have a problem', 'I have a generic problem I think its embarrasing to talk about. Someone help?', '1')";
-        $q5 = "INSERT INTO posts(author, date, title, content, cost) VALUES ('admin', '26082015', 'I also have a problem', 'I generally fear very much for my health', '0')";
+        $q4 = "INSERT INTO posts(author, date, title, content, cost, answered) VALUES ('admin', '26082015', 'I have a problem', 'I have a generic problem I think its embarrasing to talk about. Someone help?', '1', NULL)";
+        $q5 = "INSERT INTO posts(author, date, title, content, cost, answered) VALUES ('admin', '26082015', 'I also have a problem', 'I generally fear very much for my health', '0', NULL)";
 
         self::$pdo->exec($q4);
         self::$pdo->exec($q5);

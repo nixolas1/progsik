@@ -4,6 +4,14 @@
 
     <h2>Posts</h2>
 
+    {% for postBold in postsAnswered %}
+    	<div class="post">
+    		<b>Answered by doctor: <a href="/posts/{{ postBold.postId }}">{{ postBold.title }}</a></b> by <a href="/user/{{ postBold.author }}"> {{ postBold.author }}</a>. Posted on {{ post.date }}
+    	</div>
+    {% else %}
+    	There are no payed posts
+    {% endfor %}
+
     {% for post in posts %}
         <div class="post">
             <a href="/posts/{{ post.postId }}">{{ post.title}}</a> by  <a href="/user/{{ post.author }}"> {{ post.author }}</a>. Posted on {{ post.date }}

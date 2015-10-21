@@ -27,8 +27,6 @@ class CommentRepository
         $date = (string) $comment->getDate();
         $postid = $comment->getPost();
 
-
-
         if ($comment->getCommentId() === null) {
             $query = $this->db->prepare("INSERT INTO comments (author, text, date, belongs_to_post) "
                 . "VALUES (?, ?, ?, ?)");
