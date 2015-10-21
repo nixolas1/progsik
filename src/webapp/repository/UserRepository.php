@@ -143,7 +143,9 @@ class UserRepository
     //find how much doctor has earned
     public function getEarned(User $user)
     {
-        $query = "SELECT ";
+        $query = "SELECT postId, cost, comments.author, posts.author, belongs_to_post
+                  FROM posts, users, comments
+                  WHERE postId=belongs_to_post AND cost>0;";
     }
     
     //find how much user has spent

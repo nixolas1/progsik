@@ -85,8 +85,8 @@ class Sql
     }
 
     static function insertComments() {
-        $q1 = "INSERT INTO comments(author, date, text, belongs_to_post) VALUES ('admin', '26082015', 'Don''t be shy! No reason to be afraid here',0)";
-        $q2 = "INSERT INTO comments(author, date, text, belongs_to_post) VALUES ('admin', '26082015', 'I wouldn''t worry too much, really. Just relax!',1)";
+        $q1 = "INSERT INTO comments(author, date, text, belongs_to_post) VALUES ('admin', '26082015', 'Don''t be shy! No reason to be afraid here',1)";
+        $q2 = "INSERT INTO comments(author, date, text, belongs_to_post) VALUES ('admin', '26082015', 'I wouldn''t worry too much, really. Just relax!',2)";
         self::$pdo->exec($q1);
         self::$pdo->exec($q2);
         print "[tdt4237] Done inserting comments.".PHP_EOL;
