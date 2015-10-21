@@ -139,4 +139,18 @@ class UserRepository
             $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->isDoctor(), $user->getBanknumber(), $user->getFullname(), $user->getAddress(), $user->getPostcode(), $user->getUserId()
         ));
     }
+    
+    //find how much doctor has earned
+    public function getEarned(User $user)
+    {
+        $query = "SELECT postId, cost, comments.author, posts.author, belongs_to_post
+                  FROM posts, users, comments
+                  WHERE postId=belongs_to_post AND cost>0;";
+    }
+    
+    //find how much user has spent
+    public function getSpent(User $user)
+    {
+        $query = "SELECT ";
+    }
 }

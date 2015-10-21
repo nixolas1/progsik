@@ -18,6 +18,8 @@ class User
     protected $isAdmin = 0;
     protected $isDoctor = 0;
     protected $isPaying = 0;
+    protected $earned = 0;
+    protected $spent = 0;
 
     function __construct($username, $hash, $fullname, $address, $postcode)
     {
@@ -160,6 +162,28 @@ class User
     public function setIsDoctor($isDoctor)
     {
         $this->isDoctor = $isDoctor;
+        return $this;
+    }
+    
+    public function getEarned()
+    {
+        return $this->earned;
+    }
+    
+    public function getSpent()
+    {
+        return $this->spent;
+    }
+    
+    public function setEarned($earned)
+    {
+        $this->earned = $earned;
+        return $this;
+    }
+    
+    public function setSpent($spent)
+    {
+        $this->spent = $spent;
         return $this;
     }
 }
