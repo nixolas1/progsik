@@ -42,6 +42,14 @@
             <tr></tr>
             <th>Is doctor:</th>
             <td>{{ user.isDoctor }}</td>
+            
+            {% if user.isPaying %}
+            <th>Total spent:</th>
+            <td>{{user.cost}}</td>
+            {% endif %}
+            
+            
+            
             <tr></tr>
     </table>
 {% else %}

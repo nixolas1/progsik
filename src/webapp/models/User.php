@@ -162,5 +162,4 @@ class User
         $this->isDoctor = $isDoctor;
         return $this;
     }
-
 }
