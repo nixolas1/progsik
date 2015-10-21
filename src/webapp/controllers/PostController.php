@@ -47,7 +47,7 @@ class PostController extends Controller
         if (!$this->auth->check()) {
             $this->app->redirect("/");
         }
-        $post = $this->postRepository->find($postId);
+        $post = $this->postRepository->find($postId, $this->auth->isDoctor(), $this->auth->getUsername());
         $comments = $this->commentRepository->findByPostId($postId);
         $request = $this->app->request;
         $message = $request->get('msg');

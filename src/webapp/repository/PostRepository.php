@@ -32,10 +32,20 @@ class PostRepository
             ->setCost($cost);
     }
 
-    public function find($postId)
+    public function find($postId, $isDoctor, $username)
     {
-        $sql  = $this->db->prepare("SELECT * FROM posts WHERE postId = ?");
-        $sql->execute(array($postId));
+        if($isDoctor == 1){
+            $sql = $this->db->prepare("SELECT * FROM posts WHERE postId= ?");
+            $sql->execute(array($postId));
+        }else{
+            $sql = $this->db->prepare("SELECT * 
+                FROM posts, users
+                WHERE posts.cost <= 0 AND postId = ?
+                OR (users.user == ? AND postId = ?
+                    )
+                GROUP BY posts.postId");
+            $sql->execute(array($postId, $username, $postId));
+        }
         $row = $sql->fetch();
 
         if($row === false) {
@@ -69,7 +79,7 @@ class PostRepository
         $sql   = "SELECT * 
                 FROM posts, users
                 WHERE posts.cost <= 0
-                OR (posts.cost <= 0 AND users.user == '$user'
+                OR (users.user == '$user' AND posts.answered == ''
                     )
                 GROUP BY posts.postId";
 
@@ -93,13 +103,7 @@ class PostRepository
                 FROM posts, users
                 WHERE posts.cost == 1
                 AND users.banknumber != ''
-                AND posts.postId NOT IN
-                    (SELECT belongs_to_post
-                    FROM comments
-                    WHERE comments.author IN (
-                        SELECT user
-                        FROM users
-                        WHERE isdoctor == 1))
+                AND posts.answered == ''
                 GROUP BY posts.postId";
 
         return array($this->fetchPosts($sql), $this->payedAndAnswered());
@@ -156,11 +160,11 @@ class PostRepository
         $cost    = $post->getCost();
 
         if ($post->getPostId() === null) {
-            $query = $this->db->prepare("INSERT INTO posts (title, author, content, date, cost) "
-                . "VALUES (?, ?, ?, ?, ?)");
+            $query = $this->db->prepare("INSERT INTO posts (title, author, content, date, cost, answered) "
+                . "VALUES (?, ?, ?, ?, ?, ?)");
         }
 
-        $query->execute(array($title, $author, $content, $date, $cost));
+        $query->execute(array($title, $author, $content, $date, $cost, ""));
 
         return $this->db->lastInsertId();
     }
