@@ -141,7 +141,14 @@ class Squiz_Sniffs_PHP_CommentedOutCodeSniff implements PHP_CodeSniffer_Sniff
         // of errors that don't mean anything, so ignore them.
         $oldErrors = ini_get('error_reporting');
         ini_set('error_reporting', 0);
-        $stringTokens = PHP_CodeSniffer_File::tokenizeString($content, $phpcsFile->tokenizer, $phpcsFile->eolChar);
+        try {
+            $stringTokens = PHP_CodeSniffer_File::tokenizeString($content, $phpcsFile->tokenizer, $phpcsFile->eolChar);
+        } catch (PHP_CodeSniffer_Exception $e) {
+            // We couldn't check the comment, so ignore it.
+            ini_set('error_reporting', $oldErrors);
+            return;
+        }
+
         ini_set('error_reporting', $oldErrors);
 
         $emptyTokens = array(
@@ -150,6 +157,7 @@ class Squiz_Sniffs_PHP_CommentedOutCodeSniff implements PHP_CodeSniffer_Sniff
                         T_STRING_CONCAT           => true,
                         T_ENCAPSED_AND_WHITESPACE => true,
                         T_NONE                    => true,
+                        T_COMMENT                 => true,
                        );
 
         $numTokens = count($stringTokens);
@@ -191,6 +199,7 @@ class Squiz_Sniffs_PHP_CommentedOutCodeSniff implements PHP_CodeSniffer_Sniff
                 $numComment++;
             } else if (in_array($stringTokens[$i]['code'], PHP_CodeSniffer_Tokens::$comparisonTokens) === true
                 || in_array($stringTokens[$i]['code'], PHP_CodeSniffer_Tokens::$arithmeticTokens) === true
+                || $stringTokens[$i]['code'] === T_GOTO_LABEL
             ) {
                 // Commented out HTML/XML and other docs contain a lot of these
                 // characters, so it is best to not use them directly.
