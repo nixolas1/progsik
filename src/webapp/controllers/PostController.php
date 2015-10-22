@@ -78,8 +78,6 @@ class PostController extends Controller
                 {
                     $doctor = $this->auth->getUsername();
                     $this->postRepository->update_answered($postId, $doctor);
-                }else {
-                    $doctor = NULL;
                 }
                 $comment = new Comment();
                 $comment->setAuthor($_SESSION['user']);
@@ -125,9 +123,11 @@ class PostController extends Controller
             $content = $request->post('content');
             $author = $_SESSION['user'];
             $date = date("dmY");
-            $cost = "0";
+            $cost = 0;
             if ($this->auth->isPaying()) {
                 $cost = $request->post('cost');
+                if(empty($cost))
+                    $cost = 0;
             }
 
             $validation = new PostValidation($title, $author, $content);

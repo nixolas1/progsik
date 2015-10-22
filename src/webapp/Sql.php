@@ -37,7 +37,7 @@ class Sql
             content TEXT NOT NULL, 
             date TEXT NOT NULL,
             cost varchar(10),
-            answered VARCHAR(50) NULL,
+            answered VARCHAR(50) default '',
             FOREIGN KEY(author) REFERENCES users(user));";
         $q7 = "CREATE TABLE comments(
             commentId INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -61,10 +61,11 @@ class Sql
     static function insertDummyUsers()
     {
         # generate random pass for admin user, from 12-19 chars long so bruteforcing will be discuraged
-        $admin_pass = base64_encode(openssl_random_pseudo_bytes(rand(12, 19)));
+        //$admin_pass = base64_encode(openssl_random_pseudo_bytes(rand(12, 19)));
+        $admin_pass = "1234";
         $hash1 = Hash::make($admin_pass);
         $hash2 = Hash::make("Testuser123");
-        $q1 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('admin', '$hash1', 1, 'admin', 'homebase', '9090')";
+        $q1 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode, banknumber, isdoctor) VALUES ('admin', '$hash1', 1, 'admin', 'homebase', '9090', 12345678901, 1)";
         $qTest = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('testuser', '$hash2', 1, 'admin', 'homebase', '9090')";
         
         self::$pdo->exec($q1);

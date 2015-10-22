@@ -8,8 +8,6 @@
     	<div class="post">
     		<b>Answered by doctor: <a href="/posts/{{ postBold.postId }}">{{ postBold.title }}</a></b> by <a href="/user/{{ postBold.author }}"> {{ postBold.author }}</a>. Posted on {{ post.date }}
     	</div>
-    {% else %}
-    	There are no payed posts
     {% endfor %}
 
     {% for post in posts %}
