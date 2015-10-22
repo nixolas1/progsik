@@ -40,10 +40,10 @@
             <th>Banknumber:</th>
             <td>{{ user.banknumber }}</td>
             <tr></tr>
+            {% if user.isDoctor %}
             <th>Is doctor:</th>
             <td>{{ user.isDoctor }}</td>
             <tr></tr>
-            {% if user.isDoctor %}
             <th>Total earned:</th>
             <td>{{user.earned}}</td>
             <tr></tr>
