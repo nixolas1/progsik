@@ -5,21 +5,22 @@ namespace tdt4237\webapp\models;
 class User
 {
 
-    protected $userId  = null;
+    protected $userId       = null;
     protected $username;
     protected $fullname;
     protected $address;
     protected $postcode;
     protected $hash;
-    protected $email   = null;
-    protected $bio     = 'Bio is empty.';
+    protected $email        = null;
+    protected $bio          = 'Bio is empty.';
     protected $age;
     protected $banknumber;
-    protected $isAdmin = 0;
-    protected $isDoctor = 0;
-    protected $isPaying = 0;
-    protected $earned = 0;
-    protected $spent = 0;
+    protected $isAdmin      = 0;
+    protected $isDoctor     = 0;
+    protected $isPaying     = 0;
+    protected $comanyEarned = 0;
+    protected $earned       = 0;
+    protected $spent        = 0;
 
     function __construct($username, $hash, $fullname, $address, $postcode)
     {
@@ -174,7 +175,18 @@ class User
     {
         return $this->spent;
     }
+
+    public function getCompanyEarned()
+    {
+        return $this->companyEarned;
+    }
     
+    public function setCompanyEarned($company)
+    {
+        $this->companyEarned = $company;
+        return $this;
+    }
+
     public function setEarned($earned)
     {
         $this->earned = $earned;

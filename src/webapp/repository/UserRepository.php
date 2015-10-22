@@ -141,16 +141,49 @@ class UserRepository
     }
     
     //find how much doctor has earned
-    public function getEarned(User $user)
+    public function getEarned($username)
     {
-        $query = "SELECT postId, cost, comments.author, posts.author, belongs_to_post
-                  FROM posts, users, comments
-                  WHERE postId=belongs_to_post AND cost>0;";
+        $query = "SELECT count(*)
+                  FROM posts
+                  WHERE posts.answered == '$username'";
+        $result = $this->db->prepare($query);
+        $result->execute();
+        $num_of_rows = $result->fetchColumn();
+        
+        $earned = $num_of_rows * 7;
+        return $earned;
     }
     
     //find how much user has spent
-    public function getSpent(User $user)
+    public function getSpent($username)
     {
-        $query = "SELECT ";
+        $query = "SELECT count(*)
+                  FROM posts
+                  WHERE posts.author == '$username'
+                  AND posts.cost == 1";
+
+        $results = $this->db->prepare($query);
+        $results->execute();
+        $num_of_rows = $results->fetchColumn();
+
+        $spent = $num_of_rows * 10;
+        return $spent;
+    }
+
+    public function getCompanyEarned()
+    {
+        $q1 = "SELECT count(*)
+               FROM posts
+               WHERE posts.cost == 1
+               AND posts.answered != ''";
+
+
+        $threeDollars = $this->db->prepare($q1);
+        $threeDollars->execute();
+        $num_of_rows3 = $threeDollars->fetchColumn();
+
+        $earned = ($num_of_rows3 * 3);
+
+        return $earned;
     }
 }

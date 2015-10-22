@@ -72,6 +72,16 @@ class UserController extends Controller
             if($user != false){
                 if ($this->auth->isAdmin() || $user->getUsername() == $this->auth->getUsername()) {
 
+                    if($this->auth->isDoctor()){
+                        $user->setEarned($this->userRepository->getEarned($username));
+                    }
+                    if($this->auth->isPaying()){
+                        $user->setSpent($this->userRepository->getSpent($username));
+                    }
+                    if($this->auth->isAdmin()){
+                        $user->setCompanyEarned($this->userRepository->getCompanyEarned());
+                    }
+
                     $this->render('showuser.twig', [
                         'user' => $user,
                         'username' => $username
