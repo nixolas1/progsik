@@ -61,8 +61,7 @@ class Sql
     static function insertDummyUsers()
     {
         # generate random pass for admin user, from 12-19 chars long so bruteforcing will be discuraged
-        //$admin_pass = base64_encode(openssl_random_pseudo_bytes(rand(12, 19)));
-        $admin_pass = "1234";
+        $admin_pass = base64_encode(openssl_random_pseudo_bytes(rand(12, 19)));
         $hash1 = Hash::make($admin_pass);
         $hash2 = Hash::make("Testuser123");
         $q1 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode, banknumber, isdoctor) VALUES ('admin', '$hash1', 1, 'admin', 'homebase', '9090', 12345678901, 1)";
