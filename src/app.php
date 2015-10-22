@@ -16,8 +16,8 @@ chmod(__DIR__ . '/../web/uploads', 0700);
 
 $app = new Slim([
     'templates.path' => __DIR__.'/webapp/templates/',
-    'debug' => true,
     'cookies.httponly' => true,
+    'debug' => false,
     'view' => new Twig()
 
 ]);

@@ -86,9 +86,8 @@ class PostRepository
     {
         $sql   = "SELECT * 
                 FROM posts, users
-                WHERE posts.cost <= 0
-                OR (users.user == '$user' AND posts.answered == ''
-                    )
+                WHERE posts.cost != 1
+                OR (posts.author == '$user' and posts.answered == '')
                 GROUP BY posts.postId";
 
         $q1 = $this->fetchPosts($sql);
@@ -110,7 +109,6 @@ class PostRepository
         $sql = "SELECT *
                 FROM posts, users
                 WHERE posts.cost == 1
-                AND users.banknumber != ''
                 AND posts.answered == ''
                 GROUP BY posts.postId";
 
@@ -130,10 +128,11 @@ class PostRepository
 
     public function update_answered($postId, $doctor)
     {
-        $query = $this->db->exec("UPDATE posts
-                SET answered='$doctor'
-                WHERE posts.postId == '$postId'");
-
+        $query = $this->db->exec("UPDATE posts 
+            SET answered = '$doctor'
+            WHERE posts.postId == $postId
+            AND answered == ''");
+            //(CASE WHEN LIKE '' THEN answered = '$doctor' ELSE answered) WHERE posts.postId == '$postId';");
     }
 
     public function makeFromRow($row)
