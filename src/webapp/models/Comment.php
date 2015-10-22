@@ -15,7 +15,7 @@ class Comment
     protected $text;
     protected $date;
     protected $belongs_to_post;
-    protected $doctor;
+    protected $doctor = 0;
 
 
     public function getCommentId() {
@@ -63,6 +63,15 @@ class Comment
         $this->belongs_to_post = $postId;
         return $this;
 
+    }
+
+    public function setDoctor($value) {
+        $this->doctor = $value;
+        return $this;
+    }
+
+    public function getDoctor() {
+        return $this->doctor;
     }
 
 }

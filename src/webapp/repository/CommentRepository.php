@@ -24,14 +24,15 @@ class CommentRepository
         $id = $comment->getCommentId();
         $author  = $comment->getAuthor();
         $text    = $comment->getText();
+        $doctor  = $comment->getDoctor();
         $date = (string) $comment->getDate();
         $postid = $comment->getPost();
 
         if ($comment->getCommentId() === null) {
-            $query = $this->db->prepare("INSERT INTO comments (author, text, date, belongs_to_post) "
-                . "VALUES (?, ?, ?, ?)");
+            $query = $this->db->prepare("INSERT INTO comments (author, text, date, belongs_to_post, doctor_answer) "
+                . "VALUES (?, ?, ?, ?, ?)");
 
-            return $query->execute(array($author, $text, $date, $postid));
+            return $query->execute(array($author, $text, $date, $postid, $doctor));
 
         }
     }
@@ -43,7 +44,7 @@ class CommentRepository
         $query->execute(array($postId));
 
         $rows = $query->fetchAll();
-
+        
         return array_map([$this, 'makeFromRow'], $rows);
     }
 
@@ -56,6 +57,7 @@ class CommentRepository
             ->setAuthor($row['author'])
             ->setText($row['text'])
             ->setDate($row['date'])
-            ->setPost($row['belongs_to_post']);
+            ->setPost($row['belongs_to_post'])
+            ->setDoctor($row['doctor_answer']);
     }
 }

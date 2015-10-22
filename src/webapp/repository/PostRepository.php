@@ -38,6 +38,8 @@ class PostRepository
             $sql = $this->db->prepare("SELECT * FROM posts WHERE postId= ?");
             $sql->execute(array($postId));
         }else{
+
+            //Test for not letting all users open up any post
             $sql = $this->db->prepare("SELECT * 
                 FROM posts, users
                 WHERE posts.cost <= 0 AND postId = ?
@@ -53,14 +55,6 @@ class PostRepository
         }
 
         return $this->makeFromRow($row);
-    }
-
-    public function getTotalCompanyEarned()
-    {
-        $post_cost = 3;
-        $count_answered_by_doctor = count($this->payedAndAnswered());
-        $total = $post_cost * $count_answered_by_doctor;
-        return $total;
     }
 
     private function fetchPosts($sql)
@@ -82,6 +76,7 @@ class PostRepository
         );
     }
 
+    //fetches posts that are not payed for. Will only be used by users that ain't doctors
     public function all($user)
     {
         $sql   = "SELECT * 
@@ -96,6 +91,7 @@ class PostRepository
         return array($q1, $q2);
     }
 
+    //Fetching all posts
     public function allPosts()
     {
         $sql   = "SELECT * 
@@ -104,17 +100,20 @@ class PostRepository
         return $this->fetchPosts($sql);
     }
 
+    //Fetching unanswered payed posts
     public function paying()
     {
         $sql = "SELECT *
                 FROM posts, users
                 WHERE posts.cost == 1
+                AND users.banknumber != ''
                 AND posts.answered == ''
                 GROUP BY posts.postId";
 
         return array($this->fetchPosts($sql), $this->payedAndAnswered());
     }
 
+    //fetched payed and answered posts
     public function payedAndAnswered()
     {
         $sql = "SELECT distinct *
@@ -126,6 +125,7 @@ class PostRepository
         return $this->fetchPosts($sql);
     }
 
+    //Updates whether the post has been answered by a doctor or not
     public function update_answered($postId, $doctor)
     {
         $query = $this->db->exec("UPDATE posts 

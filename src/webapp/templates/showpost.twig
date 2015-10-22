@@ -10,7 +10,7 @@
         <h2>COMMENTS</h2>
         {% for comment in comments %}
             <div class="review">
-                <b>Author:</b> {{ comment.author }} <b> posted on: {{ comment.date }} </b>
+                <b>Author:</b> {% if comment.doctor == 1 %}<span class="doctor"> Dr.</span> {% endif %}{{ comment.author }} <b> posted on: {{ comment.date }} </b>
                 <pre> {{ comment.text }}</pre>
             </div>
         {% else %}

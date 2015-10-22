@@ -74,16 +74,17 @@ class PostController extends Controller
         if(!$this->auth->guest()) {
 
             if($_SESSION['token'] == $this->app->request->post('token')) {
-                if($this->auth->isDoctor())
-                {
-                    $doctor = $this->auth->getUsername();
-                    $this->postRepository->update_answered($postId, $doctor);
-                }
                 $comment = new Comment();
                 $comment->setAuthor($_SESSION['user']);
                 $comment->setText($this->app->request->post("text"));
                 $comment->setDate(date("dmY"));
                 $comment->setPost($postId);
+                if($this->auth->isDoctor())
+                {
+                    $doctor = $this->auth->getUsername();
+                    $this->postRepository->update_answered($postId, $doctor);
+                    $comment->setDoctor(1);
+                }
                 $this->commentRepository->save($comment);
                 $this->app->redirect('/posts/' . $postId);
             }else {
