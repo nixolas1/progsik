@@ -24,7 +24,7 @@ $app = new Slim([
 
 $app->response->headers->set('X-Frame-Options', 'DENY');
 $app->response->headers->set('X-Content-Type-Options', 'nosniff');
-$app->response->headers->set('X-XSS-Protection', '1; mode=block');
+$app->response->headers->set('Content-Security-Policy', "default-src: 'self'; script-src: 'self'");
 
 $view = $app->view();
 $view->parserExtensions = array(
