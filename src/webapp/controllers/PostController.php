@@ -18,6 +18,9 @@ class PostController extends Controller
 
     public function index()
     {
+        if (!$this->auth->check()) {
+            $this->app->redirect("/");
+        }
         $postsAnswered;
         if($this->auth->isDoctor() == 1) {
             $postsArray     = $this->postRepository->paying();
