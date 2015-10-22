@@ -7,6 +7,7 @@ if (! extension_loaded('openssl')) {
 }
 
 session_cache_limiter(false);
+//session_set_cookie_params($httponly = true, $secure = true); 
 session_start();
 
 if (preg_match('/\.(?:png|jpg|jpeg|gif|txt|css|js)$/', $_SERVER["REQUEST_URI"]))

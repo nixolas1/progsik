@@ -17,9 +17,14 @@ chmod(__DIR__ . '/../web/uploads', 0700);
 $app = new Slim([
     'templates.path' => __DIR__.'/webapp/templates/',
     'debug' => true,
+    'cookies.httponly' => true,
     'view' => new Twig()
 
 ]);
+
+$app->response->headers->set('X-Frame-Options', 'DENY');
+$app->response->headers->set('X-Content-Type-Options', 'nosniff');
+$app->response->headers->set('X-XSS-Protection', '1; mode=block');
 
 $view = $app->view();
 $view->parserExtensions = array(
