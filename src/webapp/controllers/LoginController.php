@@ -29,12 +29,14 @@ class LoginController extends Controller
         $request = $this->app->request;
         $user    = $request->post('user');
         $pass    = $request->post('pass');
+        $csrf    = $request->post('csrf_token');
 
-        if ($this->auth->checkCredentials($user, $pass)) {
+        if ($this->csrf->validate($csrf) && $this->auth->checkCredentials($user, $pass)) {
             $_SESSION['user'] = $user;
-            $_SESSION['token'] = md5(uniqid(mt_rand(), true));
+
             $this->app->flash('info', "You are now successfully logged in as $user.");
             $this->app->redirect('/');
+            return;
         }
         
         $this->app->flashNow('error', 'Incorrect user/pass combination.');

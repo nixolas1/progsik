@@ -15,7 +15,8 @@ class Post
     protected $title;
     protected $content;
     protected $date;
-    protected $cost;
+    protected $paydoc;
+    protected $ansbydoc;
 
 
     public function getPostId() {
@@ -25,6 +26,16 @@ class Post
 
     public function setPostId($postId) {
         $this->postId = $postId;
+        return $this;
+    }
+
+    public function getAnsByDoc() {
+        return $this->ansbydoc;
+
+    }
+
+    public function setAnsByDoc($ansbydoc) {
+        $this->ansbydoc = $ansbydoc;
         return $this;
     }
 
@@ -63,14 +74,14 @@ class Post
     public function getTitle() {
         return $this->title;
     }
-    
-    public function setCost($cost) {
-        $this->cost = $cost;
+
+     public function setPayDoc($paydoc) {
+        $this->paydoc = $paydoc;
         return $this;
     }
 
-    public function getcost() {
-        return $this->cost;
+    public function getPayDoc() {
+        return $this->paydoc;
     }
 
 

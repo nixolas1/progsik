@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -24,8 +24,7 @@
                 {% if isLoggedIn %}
                     Logged in as {{ loggedInUsername }}.<br>
                     <a href ="{{ urlFor('showposts') }}"> Show posts</a> <br>
-                    <a href="/user/{{ loggedInUsername }}">My profile</a> <br>
-                     <a href="{{ urlFor('editprofile') }}">Edit profile</a> <br>
+                    <a href="{{ urlFor('editprofile') }}">Edit profile</a> <br>
                     <a href="{{ urlFor('createpost') }}"> Create new post</a><br>
                     <a href="{{ urlFor('logout') }}">Log out</a> <br>
                 {% else %}
@@ -40,6 +39,7 @@
 
                 <br>
 
+                <a href="/users">All users (DEBUG FEATURE) </a> <br>
             </div>
 
             <div id="content">
@@ -49,7 +49,7 @@
         </div>
 
         <div id="footer">
-            {% block footer %}here be footer{% endblock %}
+            {% block footer %}© 2015 Doge Research and Development ASA{% endblock %}
         </div>
     </body>
 </html>

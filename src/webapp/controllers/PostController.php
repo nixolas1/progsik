@@ -18,41 +18,33 @@ class PostController extends Controller
 
     public function index()
     {
-        $postsAnswered;
-        if($this->auth->isDoctor() == 1) {
-            $postsArray     = $this->postRepository->paying();
-            $posts          = $postsArray[0];
-            $postsAnswered  = $postsArray[1];
-        } else {
-            $postsArray     = $this->postRepository->all($this->auth->getUsername());
-            $posts          = $postsArray[0];
-            $postsAnswered  = $postsArray[1];
+        if ($this->auth->guest()) {
+            $this->app->flash("info", "You must be logged on to show all posts");
+            $this->app->redirect("/login");
         }
-        
-        if(!empty($posts)){
-            $posts->sortByDate();
-        }
-        if(!empty($postsAnswered)){
-            $postsAnswered->sortByDate();
-            $this->render('posts.twig', ['postsAnswered' => $postsAnswered, 'posts' => $posts]);
-        } else {
-            $this->render('posts.twig', ['posts' => $posts]);
-        }   
 
+        $posts = $this->postRepository->all();
+
+        $posts->sortByDate();
+
+        $Doc = $this->auth->isDoc();
+
+        $this->render('posts.twig', ['posts' => $posts, 'Doc' => $Doc]);
     }
 
     public function show($postId)
-    {   
-        /*only logged in users should be able to browse posts*/
-        if (!$this->auth->check()) {
-            $this->app->redirect("/");
+    {
+        if ($this->auth->guest()) {
+            $this->app->flash("info", "You must be logged on to show a post");
+            $this->app->redirect("/login");
         }
-        $post = $this->postRepository->find($postId, $this->auth->isDoctor(), $this->auth->getUsername());
+
+        $post = $this->postRepository->find($postId);
         $comments = $this->commentRepository->findByPostId($postId);
         $request = $this->app->request;
         $message = $request->get('msg');
         $variables = [];
-
+        $doc = $this->auth->isDoc();
 
         if($message) {
             $variables['msg'] = $message;
@@ -63,7 +55,7 @@ class PostController extends Controller
             'post' => $post,
             'comments' => $comments,
             'flash' => $variables,
-            'token' => $_SESSION['token']
+            'Doc' => $doc
         ]);
 
     }
@@ -73,37 +65,31 @@ class PostController extends Controller
 
         if(!$this->auth->guest()) {
 
-            if($_SESSION['token'] == $this->app->request->post('token')) {
-                if($this->auth->isDoctor())
-                {
-                    $doctor = $this->auth->getUsername();
-                    $this->postRepository->update_answered($postId, $doctor);
-                }
-                $comment = new Comment();
-                $comment->setAuthor($_SESSION['user']);
-                $comment->setText($this->app->request->post("text"));
-                $comment->setDate(date("dmY"));
-                $comment->setPost($postId);
-                $this->commentRepository->save($comment);
-                $this->app->redirect('/posts/' . $postId);
-            }else {
-                $this->app->flash('error', 'Tokens doesn\'t match.');
-                $this->app->redirect('/');
-            }
+            $comment = new Comment();
+            $comment->setAuthor($_SESSION['user']);
+            $comment->setText($this->app->request->post("text"));
+            $comment->setDate(date("dmY"));
+            $comment->setPost($postId);
+            $comment->setAnsDoc($this->app->request->post('ansdoc'));
+
+            $this->commentRepository->save($comment);
+            $this->app->redirect('/posts/' . $postId);
         }
         else {
-            $this->app->flash('info', 'you must log in to do that');
             $this->app->redirect('/login');
+            $this->app->flash('info', 'you must log in to do that');
         }
 
     }
 
     public function showNewPostForm()
     {
+        $paid = $this->auth->hasPaid();
 
         if ($this->auth->check()) {
-            $username = $_SESSION['user'];
-            $this->render('createpost.twig', ['username' => $username, 'token' => $_SESSION['token']]);
+            $this->render('createpost.twig',[
+            'hasPaid' => $paid
+        ]);
         } else {
 
             $this->app->flash('error', "You need to be logged in to create a post");
@@ -123,33 +109,29 @@ class PostController extends Controller
             $content = $request->post('content');
             $author = $_SESSION['user'];
             $date = date("dmY");
-            $cost = 0;
-            if ($this->auth->isPaying()) {
-                $cost = $request->post('cost');
-                if(empty($cost))
-                    $cost = 0;
-            }
+            $paydoc = $request->post('paydoc');
+            $price = -10;
 
-            $validation = new PostValidation($title, $author, $content);
-            if ($validation->isGoodToGo() && $_SESSION['token'] == $request->post('token')) {
+            $validation = new PostValidation($title, $author, $content, $paydoc);
+            if ($validation->isGoodToGo()) {
                 $post = new Post();
                 $post->setAuthor($author);
                 $post->setTitle($title);
                 $post->setContent($content);
                 $post->setDate($date);
-                $post->setCost($cost);
+                $post->setPayDoc($paydoc);
+                if ($paydoc != 0) {
+                    $this->userRepository->updateBalance($author, $price);
+                }
                 $savedPost = $this->postRepository->save($post);
-                $this->app->redirect('/posts/' . $savedPost . '?msg=Post succesfully posted');
-            }else if($_SESSION['token'] != $request->post('token'))
-            {
-                $this->app->flash('error', 'Tokens doesn\'t match.');
-                $this->app->redirect('/');
+                $this->app->redirect('/posts/' . $savedPost . '?msg="Post succesfully posted');
             }
         }
 
             $this->app->flashNow('error', join('<br>', $validation->getValidationErrors()));
+
+
             $this->app->render('createpost.twig');
-            // RENDER HERE
 
     }
 }

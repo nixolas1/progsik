@@ -17,35 +17,9 @@ class Sql
      */
     static function up()
     {
-        $q1 = "CREATE TABLE users (
-            id INTEGER PRIMARY KEY, 
-            user VARCHAR(50) NOT NULL UNIQUE, 
-            pass VARCHAR(256) NOT NULL, 
-            email varchar(50) default null, 
-            fullname varchar(50), 
-            address varchar(50), 
-            postcode varchar (4), 
-            age varchar(50), 
-            bio varchar(50),
-            isadmin INTEGER,
-            isdoctor INTEGER default 0,
-            banknumber varchar(15)
-            );";
-        $q6 = "CREATE TABLE posts (
-            postId INTEGER PRIMARY KEY AUTOINCREMENT, 
-            author TEXT, title TEXT NOT NULL, 
-            content TEXT NOT NULL, 
-            date TEXT NOT NULL,
-            cost varchar(10),
-            answered VARCHAR(50) default '',
-            FOREIGN KEY(author) REFERENCES users(user));";
-        $q7 = "CREATE TABLE comments(
-            commentId INTEGER PRIMARY KEY AUTOINCREMENT, 
-            date TEXT NOT NULL, 
-            author TEXT NOT NULL, 
-            text INTEGER NOT NULL, 
-            belongs_to_post INTEGER NOT NULL, 
-            FOREIGN KEY(belongs_to_post) REFERENCES posts(postId));";
+        $q6 = "CREATE TABLE posts (postId INTEGER PRIMARY KEY AUTOINCREMENT, ansbydoc varchar(50), author TEXT, title TEXT NOT NULL, content TEXT NOT NULL, paydoc varchar(50), date TEXT NOT NULL, FOREIGN KEY(author) REFERENCES users(user));";
+        $q1 = "CREATE TABLE users (id INTEGER PRIMARY KEY, user VARCHAR(50), pass VARCHAR(50), email varchar(50) default null, fullname varchar(50), address varchar(50), postcode varchar (4), age varchar(50), bio varchar(50), bankcard varchar(50), role INTEGER, balance INTEGER);";
+        $q7 = "CREATE TABLE comments(commentId INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT NOT NULL, author TEXT NOT NULL, text INTEGER NOT NULL, ansdoc varchar(50), belongs_to_post INTEGER NOT NULL, FOREIGN KEY(belongs_to_post) REFERENCES posts(postId));";
 
         self::$pdo->exec($q1);
         self::$pdo->exec($q6);
@@ -60,24 +34,28 @@ class Sql
 
     static function insertDummyUsers()
     {
-        # generate random pass for admin user, from 12-19 chars long so bruteforcing will be discuraged
-        $admin_pass = base64_encode(openssl_random_pseudo_bytes(rand(12, 19)));
-        $hash1 = Hash::make($admin_pass);
-        $hash2 = Hash::make("Testuser123");
-        $q1 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode, banknumber, isdoctor) VALUES ('admin', '$hash1', 1, 'admin', 'homebase', '9090', 12345678901, 1)";
-        $qTest = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('testuser', '$hash2', 1, 'admin', 'homebase', '9090')";
-        
+        $hash1 = Hash::make(bin2hex(openssl_random_pseudo_bytes(2)));
+        $hash2 = Hash::make('bobdylan');
+        $hash3 = Hash::make('liverpool');
+        $hash4 = Hash::make('Testuser123');
+
+        $q1 = "INSERT INTO users(user, pass, role, fullname, address, postcode) VALUES ('admin', '$hash1', 1, 'admin', 'homebase', '9090')";
+        $q2 = "INSERT INTO users(user, pass, role, fullname, address, postcode) VALUES ('bob', '$hash2', 1, 'Robert Green', 'Greenland Grove 9', '2010')";
+        $q3 = "INSERT INTO users(user, pass, role, fullname, address, postcode) VALUES ('bjarni', '$hash3', 1, 'Bjarni Torgmund', 'Hummerdale 12', '4120')";
+        $qt = "INSERT INTO users(user, pass, role, fullname, address, postcode) VALUES ('testuser', '$hash4', 1, 'Teste-Bob', 'Hummerdale 21', '4120')";
+
         self::$pdo->exec($q1);
-        self::$pdo->exec($qTest);
+        self::$pdo->exec($q2);
+        self::$pdo->exec($q3);
+        self::$pdo->exec($qt);
 
 
-        print "[tdt4237] Auto-generated admin user pass is: ".$admin_pass.PHP_EOL;
         print "[tdt4237] Done inserting dummy users.".PHP_EOL;
     }
 
     static function insertPosts() {
-        $q4 = "INSERT INTO posts(author, date, title, content, cost, answered) VALUES ('admin', '26082015', 'I have a problem', 'I have a generic problem I think its embarrasing to talk about. Someone help?', '1', '')";
-        $q5 = "INSERT INTO posts(author, date, title, content, cost, answered) VALUES ('admin', '26082015', 'I also have a problem', 'I generally fear very much for my health', '0', '')";
+        $q4 = "INSERT INTO posts(author, date, title, content) VALUES ('bob', '26082015', 'I have a problem', 'I have a generic problem I think its embarrasing to talk about. Someone help?')";
+        $q5 = "INSERT INTO posts(author, date, title, content) VALUES ('bjarni', '26082015', 'I also have a problem', 'I generally fear very much for my health')";
 
         self::$pdo->exec($q4);
         self::$pdo->exec($q5);
@@ -86,11 +64,12 @@ class Sql
     }
 
     static function insertComments() {
-        $q1 = "INSERT INTO comments(author, date, text, belongs_to_post) VALUES ('admin', '26082015', 'Don''t be shy! No reason to be afraid here',1)";
-        $q2 = "INSERT INTO comments(author, date, text, belongs_to_post) VALUES ('admin', '26082015', 'I wouldn''t worry too much, really. Just relax!',2)";
+        $q1 = "INSERT INTO comments(author, date, text, belongs_to_post) VALUES ('bjarni', '26082015', 'Don''t be shy! No reason to be afraid here',1)";
+        $q2 = "INSERT INTO comments(author, date, text, belongs_to_post) VALUES ('bob', '26082015', 'I wouldn''t worry too much, really. Just relax!',2)";
         self::$pdo->exec($q1);
         self::$pdo->exec($q2);
         print "[tdt4237] Done inserting comments.".PHP_EOL;
+
 
     }
 

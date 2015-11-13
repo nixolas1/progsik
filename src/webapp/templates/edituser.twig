@@ -4,8 +4,14 @@
 
     <h2>Edit profile</h2>
 
+    <div class="balance">
+        <h3>Your current balance:</h3>
+        <input type="text" name="balance" value="{{ user.balance }}" disabled> <br/>
+
+    </div>
+
     <form action="" method="POST">
-        <div id="flasherror">{{ flash.error }}</div>
+        <div id="flasherror">{{ flash.error|raw }}</div>
 
         <label>Full name:</label>
         <input type = "text" name="fullname" value= "{{ user.fullname }}"> <br />
@@ -14,23 +20,21 @@
         <input type = "text" name="address" value= "{{ user.address }}"> <br />
 
         <label>Postcode:</label>
-        <input type = "number" name="postcode"  value= "{{ user.postcode }}"> <br />
+        <input type = "text" name="postcode"  value= "{{ user.postcode }}"> <br />
 
         <label>Email:</label>
-
-      
-        <input type="email" name="email" value="{{ user.email}}"> <br />
-
+        <input type="text" name="email" value="{{ user.email }}"> <br />
 
         <label>Bio:</label>
         <textarea name="bio">{{ user.bio }}</textarea>
 
         <label>Age:</label>
-        <input type="number" name="age" value="{{ user.age }}"> <br />
+        <input type="text" name="age" value="{{ user.age }}"> <br />
 
-        <label>Bank Number:</label>
-        <input type="text" name="banknumber" value="{{ user.banknumber }}"> <br />
+        <label>Bankcard:</label>
+        <input type="int" name="bankcard" value="{{ user.bankcard }}"> <br />
 
+        <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
         <input type="submit" name="submit" value="Save profile">
     </form>
 {% endblock %}

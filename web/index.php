@@ -1,13 +1,12 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 'on');
+error_reporting(0);
+ini_set('display_errors', 0);
 
 if (! extension_loaded('openssl')) {
     die('You must enable the openssl extension.');
 }
 
 session_cache_limiter(false);
-ini_set('session.cookie_httponly', 1);
 session_start();
 
 if (preg_match('/\.(?:png|jpg|jpeg|gif|txt|css|js)$/', $_SERVER["REQUEST_URI"]))

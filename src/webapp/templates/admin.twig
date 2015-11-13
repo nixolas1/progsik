@@ -9,23 +9,19 @@
     <tr>
         <th>Id</th>
         <th>Username</th>
+        <th>Delete user</th>
+        <th>Set Doctor</th>
+        <th>Remove Doctor</th>
+        <th>Role</th>
     </tr>
     {% for user in users %}
         <tr>
             <td>{{ user.userid }}</td>
-
             <td><a href="/user/{{ user.username }}">{{ user.username }}</a></td>
             <td><a href="/admin/delete/{{ user.username }}">Delete this user</a></td>
-            <td>
-                <a href="/admin/make_doctor/{{ user.username }}/{% if user.isdoctor == "0" %}1{% else %}0{% endif %}">
-                    {% if user.isdoctor == "0" %}
-                    Make this user a doctor
-                    {% else %}
-                    Remove Doctor status
-                    {% endif %}
-                </a>
-            </td>
-
+            <td><a href="/admin/setDoc/{{ user.username }}">Set Doctor</a></td>
+            <td><a href="/admin/removeDoc/{{ user.username }}">Remove Doctor</a></td>
+            <td>{{ user.role }}</td>
         </tr>
     {% endfor %}
     </table>
@@ -38,11 +34,13 @@
         <tr>
             <th> Id</th>
             <th> Title</th>
+            <th> Paid</th>
         </tr>
         {% for post in posts %}
         <tr>
-            <td><a href="/posts/{{ post.postid|raw }}">{{ post.title }}</a></td>
-            <td><a href="/admin/delete/post/{{ post.postid|raw }}">Delete this post</a></td>
+            <td><a href="/posts/{{ post.postid }}">{{ post.title }}</a></td>
+            <td><a href="/admin/delete/post/{{ post.postid }}">Delete this post</a></td>
+            <td>{{ post.paydoc }}</td>
         </tr>
         {% endfor %}
     </table>

@@ -21,9 +21,19 @@ class ForgotPasswordController extends Controller {
     }
 
     function submitName() {
+
         $username = $this->app->request->post('username');
+        $csrf    = $this->app->request->post('csrf_token');
+
+        if (!$this->csrf->validate($csrf)) {
+            $this->app->flashNow('error', 'An error occurred with your request.');
+            return $this->render('forgotPassword.twig');
+        }
+
         if($username != "") {
-            $this->app->redirect('/forgot/' . $username);
+            $this->app->flash('success', 'Instructions to reset you password has been sent to your email.');
+            // $sendmail
+            $this->app->redirect('/login');
         }
         else {
             $this->render('forgotPassword.twig');
@@ -32,14 +42,12 @@ class ForgotPasswordController extends Controller {
 
     }
 
-    function confirm() {
-        $this->app->flash('success', 'Thank you! The password was sent to your email');
-        // $sendmail
-
-        $this->app->redirect('/login');
-    }
-
     function deny() {
 
     }
+
+
+
+
+
 } 

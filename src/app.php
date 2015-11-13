@@ -4,6 +4,7 @@ use Slim\Slim;
 use Slim\Views\Twig;
 use Slim\Views\TwigExtension;
 use tdt4237\webapp\Auth;
+use tdt4237\webapp\Csrf;
 use tdt4237\webapp\Hash;
 use tdt4237\webapp\repository\UserRepository;
 use tdt4237\webapp\repository\PostRepository;
@@ -16,15 +17,10 @@ chmod(__DIR__ . '/../web/uploads', 0700);
 
 $app = new Slim([
     'templates.path' => __DIR__.'/webapp/templates/',
-    'cookies.httponly' => true,
     'debug' => false,
     'view' => new Twig()
 
 ]);
-
-$app->response->headers->set('X-Frame-Options', 'DENY');
-$app->response->headers->set('X-Content-Type-Options', 'nosniff');
-$app->response->headers->set('Content-Security-Policy', "default-src: 'self'; script-src: 'self'");
 
 $view = $app->view();
 $view->parserExtensions = array(
@@ -37,7 +33,7 @@ try {
     // Set errormode to exceptions
     $app->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    //echo $e->getMessage();
+    echo $e->getMessage();
     exit();
 }
 
@@ -50,6 +46,7 @@ $app->userRepository = new UserRepository($app->db);
 $app->postRepository = new PostRepository($app->db);
 $app->commentRepository = new CommentRepository($app->db);
 $app->auth = new Auth($app->userRepository, $app->hash);
+$app->csrf = new Csrf();
 
 $ns ='tdt4237\\webapp\\controllers\\';
 
@@ -70,10 +67,13 @@ $app->post('/user/edit', $ns . 'UserController:receiveUserEditForm');
 
 // Forgot password
 $app->get('/forgot', $ns . 'ForgotPasswordController:forgotPassword');
-$app->post('/forgot', $ns . 'ForgotPasswordController:confirm');
+$app->post('/forgot', $ns . 'ForgotPasswordController:submitName');
 
 // Show a user by name
 $app->get('/user/:username', $ns . 'UserController:show')->name('showuser');
+
+// Show all users
+$app->get('/users', $ns . 'UserController:all');
 
 // Posts
 $app->get('/posts/new', $ns . 'PostController:showNewPostForm')->name('createpost');
@@ -91,7 +91,8 @@ $app->get('/logout', $ns . 'UserController:logout')->name('logout');
 $app->get('/admin', $ns . 'AdminController:index')->name('admin');
 $app->get('/admin/delete/post/:postid', $ns . 'AdminController:deletepost');
 $app->get('/admin/delete/:username', $ns . 'AdminController:delete');
-$app->get('/admin/make_doctor/:username/:isdoctor', $ns . 'AdminController:make_doctor');
+$app->get('/admin/setDoc/:username', $ns . 'AdminController:setDoc');
+$app->get('/admin/removeDoc/:username', $ns . 'AdminController:removeDoc');
 
 
 return $app;

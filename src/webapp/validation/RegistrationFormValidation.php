@@ -3,6 +3,7 @@
 namespace tdt4237\webapp\validation;
 
 use tdt4237\webapp\models\User;
+use tdt4237\webapp\repository\UserRepository;
 
 class RegistrationFormValidation
 {
@@ -13,6 +14,8 @@ class RegistrationFormValidation
     public function __construct($username, $password, $fullname, $address, $postcode)
     {
         $this->app = \Slim\Slim::getInstance();
+        $this->userRepository = $this->app->userRepository;
+
         return $this->validate($username, $password, $fullname, $address, $postcode);
     }
     
@@ -29,43 +32,59 @@ class RegistrationFormValidation
     private function validate($username, $password, $fullname, $address, $postcode)
     {
         if (empty($password)) {
-            $this->validationErrors[] = 'Password cannot be empty';
-        }
-        
-        if (strlen($password) > 72) {
-            $this->validationErrors[] = "Password cannot contain more than 72 characters";
-        }
-        
-        if (strlen($password) < 8) {
-            $this->validationErrors[] = "Password should have atleast 8 characters";
+            $this->validationErrors[] = 'Password can\'t be shorter than 8 characters';
+        }//check if the pass is less than 8
+        elseif(strlen($password) < 8) {
+            $this->validationErrors[] = 'Password can\'t be shorter than 8 characters';
+        }// check if the pass is greater than 1024
+        elseif(strlen($password)> 1024){
+            $this->validationErrors[] = 'Password too long';
         }
 
-        if(empty($fullname)) {
-            $this->validationErrors[] = "Please write in your full name";
+        //check if fullname is not empty
+        if(empty($fullname)){
+            $this->validationErrors[] = "Full name cannot be empty!";
         }
-
-        if(empty($address)) {
-            $this->validationErrors[] = "Please write in your address";
+       
+        if (empty($address)) {
+            $this->validationErrors[] = "Address cannot be empty!";
         }
 
         if(empty($postcode)) {
             $this->validationErrors[] = "Please write in your post code";
         }
-
-        if (strlen($postcode) != "4") {
+        elseif (strlen($postcode) != "4") {
             $this->validationErrors[] = "Post code must be exactly four digits";
-        }
-        
-        if (!ctype_digit($postcode)) {
-            $this->validationErrors[] = "Post code must be a number";
+        }//check if the postcode is in numbers
+        elseif(preg_match('/^\d+$/',$postcode) === 0){
+            $this->validationErrors[] = "Postcode must be in numbers";
         }
 
-        if (preg_match('/^[A-Za-z0-9_]+$/', $username) === 0) {
+        if (preg_match('/^[A-Za-z0-9]+$/', $username) === 0) {
             $this->validationErrors[] = 'Username can only contain letters and numbers';
         }
-        
-        if ($this->app->userRepository->findByUser($username)) {
-            $this->validationErrors[] = 'Username already exist';
+        elseif (strlen($username) < 3) {
+            $this->validationErrors[] = 'Username must be longer than 2';
         }
+
+        elseif (strlen($username) > 32) {
+            $this->validationErrors[] = 'Username must be shorter than 32';
+        }
+
+        elseif ($this->userRepository->checkUsernameAvailable($username) > 0) {
+            $this->validationErrors[] = 'Username already exists';
+        }
+       
     }
 }
+
+
+
+
+
+
+
+
+
+
+

@@ -19,7 +19,7 @@ class PostRepository
         $this->db = $db;
     }
     
-    public static function create($id, $author, $title, $content, $date, $cost)
+    public static function create($id, $author, $title, $content, $date, $paydoc, $ansbydoc)
     {
         $post = new Post;
         
@@ -29,47 +29,39 @@ class PostRepository
             ->setTitle($title)
             ->setContent($content)
             ->setDate($date)
-            ->setCost($cost);
+            ->setPayDoc($paydoc)
+            ->setAnsByDoc($ansbydoc);
     }
 
-    public function find($postId, $isDoctor, $username)
+
+
+    // VASKAD
+    public function find($postId)
     {
-        if($isDoctor == 1){
-            $sql = $this->db->prepare("SELECT * FROM posts WHERE postId= ?");
-            $sql->execute(array($postId));
-        }else{
-            $sql = $this->db->prepare("SELECT * 
-                FROM posts, users
-                WHERE posts.cost <= 0 AND postId = ?
-                OR (users.user == ? AND postId = ?
-                    )
-                GROUP BY posts.postId");
-            $sql->execute(array($postId, $username, $postId));
+        $query = "SELECT * FROM posts WHERE postId = :postId ";
+        $query_params = array( ':postId' => $postId); 
+
+        try { 
+            $stmt = $this->db->prepare($query);
+            $stmt->execute($query_params); 
+            $row = $stmt->fetch();
+            if($row === false) {
+                return false;
+            }
+            return $this->makeFromRow($row);
         }
-        $row = $sql->fetch();
-
-        if($row === false) {
-            return false;
-        }
-
-        return $this->makeFromRow($row);
+        catch(PDOException $ex){ die("Failed to run query: " . $ex->getMessage()); } 
     }
 
-    public function getTotalCompanyEarned()
-    {
-        $post_cost = 3;
-        $count_answered_by_doctor = count($this->payedAndAnswered());
-        $total = $post_cost * $count_answered_by_doctor;
-        return $total;
-    }
 
-    private function fetchPosts($sql)
+    public function all()
     {
+        $sql   = "SELECT * FROM posts";
         $results = $this->db->query($sql);
 
         if($results === false) {
             return [];
-            throw new \Exception('PDO error in posts paying()');
+            throw new \Exception('PDO error in posts all()');
         }
 
         $fetch = $results->fetchAll();
@@ -80,59 +72,7 @@ class PostRepository
         return new PostCollection(
             array_map([$this, 'makeFromRow'], $fetch)
         );
-    }
 
-    public function all($user)
-    {
-        $sql   = "SELECT * 
-                FROM posts, users
-                WHERE posts.cost != 1
-                OR (posts.author == '$user' and posts.answered == '')
-                GROUP BY posts.postId";
-
-        $q1 = $this->fetchPosts($sql);
-        $q2 = $this->payedAndAnswered();
-
-        return array($q1, $q2);
-    }
-
-    public function allPosts()
-    {
-        $sql   = "SELECT * 
-                FROM posts";
-
-        return $this->fetchPosts($sql);
-    }
-
-    public function paying()
-    {
-        $sql = "SELECT *
-                FROM posts, users
-                WHERE posts.cost == 1
-                AND posts.answered == ''
-                GROUP BY posts.postId";
-
-        return array($this->fetchPosts($sql), $this->payedAndAnswered());
-    }
-
-    public function payedAndAnswered()
-    {
-        $sql = "SELECT distinct *
-                FROM posts, users
-                WHERE posts.cost == 1
-                AND users.banknumber != ''
-                AND posts.answered != ''
-                GROUP BY posts.postId";
-        return $this->fetchPosts($sql);
-    }
-
-    public function update_answered($postId, $doctor)
-    {
-        $query = $this->db->exec("UPDATE posts 
-            SET answered = '$doctor'
-            WHERE posts.postId == $postId
-            AND answered == ''");
-            //(CASE WHEN LIKE '' THEN answered = '$doctor' ELSE answered) WHERE posts.postId == '$postId';");
     }
 
     public function makeFromRow($row)
@@ -143,36 +83,41 @@ class PostRepository
             $row['title'],
             $row['content'],
             $row['date'],
-            $row['cost']
+            $row['paydoc'],
+            $row['ansbydoc']
         );
-
-       //  $this->db = $db;
     }
 
     public function deleteByPostid($postId)
     {
-        $query = $this->db->prepare("DELETE FROM posts WHERE postid=?");
-        return $query->execute(array($postId));
-        //return $this->db->exec(
-        //    sprintf("DELETE FROM posts WHERE postid='%s';", $postId));
+        $query = "DELETE FROM posts WHERE postid= :postId ";
+        $query_params = array( ':postId' => $postId); 
+
+
+        try { 
+            $stmt = $this->db->prepare($query);
+            $stmt->execute($query_params); 
+            
+            return 1;
+        }
+        catch(PDOException $ex){ die("Failed to run query: " . $ex->getMessage()); } 
+
     }
 
 
     public function save(Post $post)
     {
-        $title   = $post->getTitle();
-        $author = $post->getAuthor();
-        $content = $post->getContent();
-        $date    = $post->getDate();
-        $cost    = $post->getCost();
+  
+        $query =  "INSERT INTO posts (title, author, content, date, paydoc) VALUES (:title, :author, :content, :date, :paydoc)";
+        $query_params = array( ':title' => $post->getTitle(), ':author' => $post->getAuthor(), ':content' => $post->getContent(), ':date' => $post->getDate(), ':paydoc' => $post->getPayDoc()); 
 
-        if ($post->getPostId() === null) {
-            $query = $this->db->prepare("INSERT INTO posts (title, author, content, date, cost, answered) "
-                . "VALUES (?, ?, ?, ?, ?, ?)");
+        try { 
+            $stmt = $this->db->prepare($query);
+            $stmt->execute($query_params); 
+            
+            return $this->db->lastInsertId();
         }
+        catch(PDOException $ex){ die("Failed to run query: " . $ex->getMessage()); } 
 
-        $query->execute(array($title, $author, $content, $date, $cost, ""));
-
-        return $this->db->lastInsertId();
     }
 }

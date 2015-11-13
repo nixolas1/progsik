@@ -36,8 +36,16 @@ class UserController extends Controller
         $address = $request->post('address');
         $postcode = $request->post('postcode');
 
+        $csrf    = $request->post('csrf_token');
 
         $validation = new RegistrationFormValidation($username, $password, $fullname, $address, $postcode);
+
+        if (!$this->csrf->validate($csrf)) {
+            $this->app->flashNow('info', 'An error occurred with your request.');
+
+            $this->render('newUserForm.twig', ['username' => $username]);
+            return;
+        }
 
         if ($validation->isGoodToGo()) {
             $password = $password;
@@ -49,11 +57,17 @@ class UserController extends Controller
             return $this->app->redirect('/login');
         }
 
-        $errors = $validation->getValidationErrors();
+        $errors = join("<br>\n", $validation->getValidationErrors());
         $this->app->flashNow('error', $errors);
         $this->render('newUserForm.twig', ['username' => $username]);
     }
 
+    public function all()
+    {
+        $this->render('users.twig', [
+            'users' => $this->userRepository->all()
+        ]);
+    }
 
     public function logout()
     {
@@ -69,33 +83,19 @@ class UserController extends Controller
 
         } else {
             $user = $this->userRepository->findByUser($username);
-            if($user != false){
-                if ($this->auth->isAdmin() || $user->getUsername() == $this->auth->getUsername()) {
 
-                    if($this->auth->isDoctor()){
-                        $user->setEarned($this->userRepository->getEarned($username));
-                    }
-                    if($this->auth->isPaying()){
-                        $user->setSpent($this->userRepository->getSpent($username));
-                    }
-                    if($this->auth->isAdmin()){
-                        $user->setCompanyEarned($this->userRepository->getCompanyEarned());
-                    }
+            if ($user != false && $user->getUsername() == $this->auth->getUsername()) {
 
-                    $this->render('showuser.twig', [
-                        'user' => $user,
-                        'username' => $username
-                    ]);
-                } else if ($this->auth->check()) {
+                $this->render('showuser.twig', [
+                    'user' => $user,
+                    'username' => $username
+                ]);
+            } else if ($this->auth->check()) {
 
-                    $this->render('showuserlite.twig', [
-                        'user' => $user,
-                        'username' => $username
-                    ]);
-                }
-            }else{
-                $this->app->flash("info", "Invalid user");
-                $this->app->redirect("/");
+                $this->render('showuserlite.twig', [
+                    'user' => $user,
+                    'username' => $username
+                ]);
             }
         }
     }
@@ -121,9 +121,16 @@ class UserController extends Controller
         $fullname = $request->post('fullname');
         $address = $request->post('address');
         $postcode = $request->post('postcode');
-        $banknumber = $request->post('banknumber');
+        $bankcard = $request->post('bankcard');
 
-        $validation = new EditUserFormValidation($email, $bio, $age, $banknumber);
+        $csrf    = $request->post('csrf_token');
+
+        if (!$this->csrf->validate($csrf)) {
+            $this->app->flashNow('info', 'An error occurred with your request.');
+            return $this->render('edituser.twig', ['user' => $user]);
+        }
+
+        $validation = new EditUserFormValidation($email, $bio, $age, $bankcard);
 
         if ($validation->isGoodToGo()) {
             $user->setEmail(new Email($email));
@@ -132,7 +139,7 @@ class UserController extends Controller
             $user->setFullname($fullname);
             $user->setAddress($address);
             $user->setPostcode($postcode);
-            $user->setBanknumber($banknumber);
+            $user->setBankCard($bankcard);
             $this->userRepository->save($user);
 
             $this->app->flashNow('info', 'Your profile was successfully saved.');

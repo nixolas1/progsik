@@ -15,8 +15,7 @@ class Comment
     protected $text;
     protected $date;
     protected $belongs_to_post;
-    protected $doctor;
-
+    protected $ansdoc;
 
     public function getCommentId() {
         return $this->commentId;
@@ -55,6 +54,15 @@ class Comment
         return $this;
     }
 
+    public function getAnsDoc() {
+        return $this->ansdoc;
+    }
+
+    public function setAnsDoc($ansdoc) {
+        $this->ansdoc = $ansdoc;
+        return $this;
+    }
+
     public function getPost() {
         return $this->belongs_to_post;
     }
@@ -64,5 +72,10 @@ class Comment
         return $this;
 
     }
+
+
+
+
+
 
 }

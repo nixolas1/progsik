@@ -70,3 +70,15 @@ label {
     border: 1px solid gray;
     margin: 10px;
 }
+.doc{
+    border: 1px solid gray;
+    margin: 10px;
+    background-color: cornsilk;
+}
+
+.postdoc{
+    background-color: cornsilk;
+}
+
+
+

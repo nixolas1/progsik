@@ -1,31 +1,61 @@
 {% extends 'base.twig' %}
 
 {% block content %}
-    <h3> {{ flash.msg }}</h3>
+    <h3> {{ flash.msg|raw }}</h3>
     {% if post %}
         <h2>{{ post.title}}</h2>
         <h3> by {{post.author}}</h3>
         <p> {{ post.content }}</p>
         <lb></lb>
+
+
+
+
         <h2>COMMENTS</h2>
         {% for comment in comments %}
-            <div class="review">
-                <b>Author:</b> {{ comment.author }} <b> posted on: {{ comment.date }} </b>
-                <pre> {{ comment.text }}</pre>
-            </div>
+            {% if comment.ansdoc == 1 %}
+                <div class="doc">
+                    <b>This post is answered by a doctor. Author:</b> {{ comment.author }} <b> posted on: {{ comment.date }} </b>
+                    <pre> {{ comment.text }}</pre>
+                </div>
+            {% else %}
+                <div class="review">
+                    <b>Author:</b> {{ comment.author }} <b> posted on: {{ comment.date }} </b>
+                    <pre> {{ comment.text }}</pre>
+                </div>
+
+            {% endif %}
         {% else %}
             <br>
             Be the first one to write a comment for this post.
             <br>
             <br>
         {% endfor %}
+
+
+
+
+
+
         <h2>Post your comment here</h2><br />
-        <p>Comment: </p>
-        <form method="post" action="">
-            <textarea cols="40" rows="10" name="text" ></textarea> <br />
-            <input type="hidden" name="token" value="{{token}}">
-            <input type="submit" value="Submit comment" name="submit"></button>
-        </form>
+        
+        {% if Doc %}
+            <p>Comment: </p>
+                <form method="post" action="">
+                    <textarea cols="40" rows="10" name="text" ></textarea> <br />
+                    <input type="hidden" name="ansdoc" value="1" />
+                    <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+                    <input type="submit" value="Submit comment" name="submit"></button>
+                </form>
+        {% else %}
+            <form method="post" action="">
+                    <textarea cols="40" rows="10" name="text" ></textarea> <br />
+                    <input type="hidden" name="ansdoc" value="0" />
+                    <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+                    <input type="submit" value="Submit comment" name="submit"></button>
+                </form>
+        {% endif %}
+
 
     {% else %}
         <h1> Unable to find that post. </h1>

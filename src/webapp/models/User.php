@@ -5,22 +5,19 @@ namespace tdt4237\webapp\models;
 class User
 {
 
-    protected $userId       = null;
+    protected $userId  = null;
     protected $username;
     protected $fullname;
     protected $address;
     protected $postcode;
     protected $hash;
-    protected $email        = null;
-    protected $bio          = 'Bio is empty.';
+    protected $email   = null;
+    protected $bio     = 'Bio is empty.';
     protected $age;
-    protected $banknumber;
-    protected $isAdmin      = 0;
-    protected $isDoctor     = 0;
-    protected $isPaying     = 0;
-    protected $comanyEarned = 0;
-    protected $earned       = 0;
-    protected $spent        = 0;
+    protected $bankcard;
+    protected $role = 0;
+    protected $balance = 9;
+    //protected $balance = $this->userRepository->findBalance($username);
 
     function __construct($username, $hash, $fullname, $address, $postcode)
     {
@@ -34,6 +31,16 @@ class User
     public function getUserId()
     {
         return $this->userId;
+    }
+
+    public function getBalance()
+    {
+        return $this->balance;
+    }
+
+    public function getRole()
+    {
+        return $this->role;
     }
 
     public function getUsername()
@@ -61,9 +68,9 @@ class User
         return $this->age;
     }
 
-    public function getBanknumber()
+    public function getBankCard()
     {
-        return $this->banknumber;
+        return $this->bankcard;
     }
 
     public function getFullname() {
@@ -92,24 +99,14 @@ class User
 
     }
 
-    public function setBanknumber($banknumber) {
-        $this->banknumber = $banknumber;
-
-    }
-
     public function isAdmin()
     {
-        return $this->isAdmin === '1';
-    }
-    
-    public function isPaying()
-    {
-        return $this->isPaying === '1';
+        return $this->role === '1';
     }
 
-    public function isDoctor()
+    public function isDoc()
     {
-        return $this->isDoctor == '1';
+        return $this->role === '2';
     }
 
     public function setUserId($userId)
@@ -148,54 +145,28 @@ class User
         return $this;
     }
 
-    public function setIsAdmin($isAdmin)
+    public function setBalance($balance)
     {
-        $this->isAdmin = $isAdmin;
-        return $this;
-    }
-    
-    public function setIsPaying($isPaying)
-    {
-        $this->isPaying = $isPaying;
+        $this->balance = $balance;
         return $this;
     }
 
-    public function setIsDoctor($isDoctor)
+    public function setBankCard($bankcard)
     {
-        $this->isDoctor = $isDoctor;
-        return $this;
-    }
-    
-    public function getEarned()
-    {
-        return $this->earned;
-    }
-    
-    public function getSpent()
-    {
-        return $this->spent;
-    }
-
-    public function getCompanyEarned()
-    {
-        return $this->companyEarned;
-    }
-    
-    public function setCompanyEarned($company)
-    {
-        $this->companyEarned = $company;
+        $this->bankcard = $bankcard;
         return $this;
     }
 
-    public function setEarned($earned)
+    public function setIsAdmin($role)
     {
-        $this->earned = $earned;
+        $this->role = $role;
         return $this;
     }
-    
-    public function setSpent($spent)
+
+    public function setIsDoc($role)
     {
-        $this->spent = $spent;
+        $this->role = $role;
         return $this;
     }
+
 }

@@ -6,9 +6,9 @@ class EditUserFormValidation
 {
     private $validationErrors = [];
     
-    public function __construct($email, $bio, $age, $banknumber)
+    public function __construct($email, $bio, $age, $bankcard)
     {
-        $this->validate($email, $bio, $age, $banknumber);
+        $this->validate($email, $bio, $age, $bankcard);
     }
     
     public function isGoodToGo()
@@ -21,12 +21,12 @@ class EditUserFormValidation
         return $this->validationErrors;
     }
 
-    private function validate($email, $bio, $age, $banknumber)
+    private function validate($email, $bio, $age, $bankcard)
     {
         $this->validateEmail($email);
         $this->validateAge($age);
         $this->validateBio($bio);
-        $this->validateBanknumber($banknumber);
+        $this->validateBankCard($bankcard);
     }
     
     private function validateEmail($email)
@@ -43,17 +43,20 @@ class EditUserFormValidation
         }
     }
 
-    private function validateBanknumber($bank)
+    private function validateBio($bio)
     {
-        if (!empty($bank) && strlen($bank) < 11) {
-            $this->validationErrors[] = 'Bank number must be at least 11 numbers.';
+        if (empty($bio) or strlen($bio) > 20000) {
+            $this->validationErrors[] = 'Bio cannot be empty or be longer than 20000 characters';
         }
     }
 
-    private function validateBio($bio)
+    private function validateBankCard($bankcard)
     {
-        if (empty($bio)) {
-            $this->validationErrors[] = 'Bio cannot be empty';
+        if (preg_match('/^\d{10}$/', $bankcard) or strlen((string)$bankcard) == 0) {
+          //
+        }
+        else {
+            $this->validationErrors[] = 'Bankcard must contain 10 numbers only';
         }
     }
 }

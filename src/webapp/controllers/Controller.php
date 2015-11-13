@@ -18,16 +18,18 @@ class Controller
         $this->postRepository = $this->app->postRepository;
         $this->commentRepository = $this->app->commentRepository;
         $this->auth = $this->app->auth;
+        $this->csrf = $this->app->csrf;
         $this->hash = $this->app->hash;
     }
 
     protected function render($template, $variables = [])
     {
+        $variables['csrfToken'] = $this->csrf->getToken();
+
         if ($this->auth->check()) {
             $variables['isLoggedIn'] = true;
             $variables['isAdmin'] = $this->auth->isAdmin();
             $variables['loggedInUsername'] = $_SESSION['user'];
-            $variables['isPaying'] = $this->auth->isPaying();
         }
 
         print $this->app->render($template, $variables);

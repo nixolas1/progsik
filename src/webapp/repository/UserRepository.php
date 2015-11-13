@@ -7,25 +7,38 @@ use tdt4237\webapp\models\Age;
 use tdt4237\webapp\models\Email;
 use tdt4237\webapp\models\NullUser;
 use tdt4237\webapp\models\User;
+use tdt4237\webapp\models\BankCard;
 
 class UserRepository
 {
-    const INSERT_QUERY   = "INSERT INTO users(user, pass, email, age, bio, isadmin, isdoctor, banknumber, fullname, address, postcode) VALUES(?, ?, ? , ? , ?, ?, ?, ?, ?, ?, ?)";
-    const UPDATE_QUERY   = "UPDATE users SET email=?, age=?, bio=?, isadmin=?, isdoctor=?, banknumber=?, fullname =?, address = ?, postcode = ? WHERE id=?";
-    const FIND_BY_NAME   = "SELECT * FROM users WHERE user=?";
-    const DELETE_BY_NAME = "DELETE FROM users WHERE user=?";
+    const INSERT_QUERY   = "INSERT INTO users(user, pass, email, age, bio, role, fullname, address, postcode, bankcard) VALUES(:username, :password, :email , :age , :bio, :role, :fullname, :address, :postcode, :bankcard)";
+    const UPDATE_QUERY   = "UPDATE users SET email= :email, age= :age, bio= :bio, role= :role, fullname = :fullname, address = :address, postcode = :postcode, bankcard =  :bankcard WHERE id= :id";
+    const UPDATE_ROLE_QUERY = "UPDATE users SET role= :role WHERE user= :user";
+    const FIND_BY_NAME   = "SELECT * FROM users WHERE user= :username";
+    const DELETE_BY_NAME = "DELETE FROM users WHERE user= :username";
     const SELECT_ALL     = "SELECT * FROM users";
-    const FIND_FULL_NAME   = "SELECT * FROM users WHERE user=?";
+    const FIND_FULL_NAME   = "SELECT * FROM users WHERE user = :username";
+    const FIND_BANKCARD   = "SELECT bankcard FROM users WHERE user = :username";
+    const FIND_BALANCE   = "SELECT balance FROM users WHERE user = :username";
+    const UPDATE_BALANCE  = "UPDATE users SET balance= :balance WHERE user = :username";
 
     /**
      * @var PDO
      */
-    private $db;
+    private $pdo;
 
-    public function __construct(PDO $db)
+    public function __construct(PDO $pdo)
     {
-        $this->db = $db;
+        $this->pdo = $pdo;
     }
+
+    /*
+    
+    NU JÄVLAR VAD RENT DET BLEV !
+
+    #NYVASKET
+
+    */
 
     public function makeUserFromRow(array $row)
     {
@@ -35,10 +48,8 @@ class UserRepository
         $user->setAddress(($row['address']));
         $user->setPostcode((($row['postcode'])));
         $user->setBio($row['bio']);
-        $user->setIsAdmin($row['isadmin']);
-        $user->setIsDoctor($row['isdoctor']);
-        $user->setBanknumber($row['banknumber']);
-        $user->setIsPaying('0');
+        $user->setBalance($row['balance']);
+        $user->setIsAdmin($row['role']);
 
         if (!empty($row['email'])) {
             $user->setEmail(new Email($row['email']));
@@ -47,31 +58,58 @@ class UserRepository
         if (!empty($row['age'])) {
             $user->setAge(new Age($row['age']));
         }
-        
-        if (!empty($row['banknumber'])) {
-            $user->setIsPaying('1');
-        }
 
+        if (!empty($row['bankcard'])) {
+            $user->setBankCard(new BankCard($row['bankcard']));
+        }
         return $user;
     }
 
+
+    // VASKAD
     public function getNameByUsername($username)
     {
-        $query = $this->db->prepare(self::FIND_FULL_NAME);
-        $query->execute(array($username));
-        //$result = $this->db->query($query, PDO::FETCH_ASSOC);
-        $row = $query->fetch();
+        $query = self::FIND_FULL_NAME;
+        $query_params = array( ':username' => $username); 
+        try { 
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($query_params); 
+            // Tvilsom linje under 
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        } 
+        catch(PDOException $ex){ die("Failed to run query: " . $ex->getMessage()); } 
+
+
         return $row['fullname'];
 
     }
 
-    public function findByUser($username)
-    {
-        $query  = $this->db->prepare(self::FIND_BY_NAME);
 
-        $query->execute(array($username));
-        //$result = $this->pdo->query($query, PDO::FETCH_ASSOC);
-        $row = $query->fetch();
+    // VASKAD
+    public function findByUser($username)
+    {   
+
+        $query = self::FIND_BY_NAME;
+        $query_params = array( ':username' => $username); 
+
+        try { 
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($query_params); 
+            // Tvilsom linje under 
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($result === false) {
+                return false;
+            }
+
+            return $this->makeUserFromRow($result);
+        } 
+        catch(PDOException $ex){ die("Failed to run query: " . $ex->getMessage()); } 
+        /*
+
+        $query  = sprintf(self::FIND_BY_NAME, $username);
+        $result = $this->pdo->query($query, PDO::FETCH_ASSOC);
+        $row = $result->fetch();
         
         if ($row === false) {
             return false;
@@ -79,30 +117,129 @@ class UserRepository
 
 
         return $this->makeUserFromRow($row);
+        */
     }
 
+    public function checkUsernameAvailable($username){
+        $query = self::FIND_BY_NAME;
+        $query_params = array( ':username' => $username); 
+
+        try { 
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($query_params); 
+            $number_of_rows = $stmt->fetchColumn();
+            return $number_of_rows;
+        } 
+        catch(PDOException $ex){ die("Failed to run query: " . $ex->getMessage()); } 
+
+    }
+
+    public function checkBankCard($username){
+        $query = self::FIND_BANKCARD;
+        $query_params = array( ':username' => $username); 
+
+        try { 
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($query_params); 
+            $res = $stmt->fetchColumn();
+            if ($res == null){
+                return false;
+            }
+            return true;
+
+        } 
+        catch(PDOException $ex){ die("Failed to run query: " . $ex->getMessage()); } 
+
+    }
+    public function findBalance($username){
+        $query = self::FIND_BALANCE;
+        $query_params = array( ':username' => $username); 
+
+        try { 
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($query_params); 
+            return $stmt->fetchColumn();
+            
+        } 
+        catch(PDOException $ex){ die("Failed to run query: " . $ex->getMessage()); } 
+
+    }
+    public function updateBalance($username, $price){
+        $query = self::UPDATE_BALANCE;
+        $currentBalance = $this->findBalance($username);
+        $newBalance = $currentBalance + $price;
+        $query_params = array( ':balance' => $newBalance ,':username' => $username); 
+
+        try { 
+            $stmt = $this->pdo->prepare($query);
+            
+            return $stmt->execute($query_params); 
+            
+        } 
+        catch(PDOException $ex){ die("Failed to run query: " . $ex->getMessage()); } 
+
+    }
+
+
+
+
+    /*
+
+    Får feilmelding i applikasjon, men alt fungerer tilsynelatende :)
+
+    */
     public function deleteByUsername($username)
     {
-        $query = $this->db->prepare(self::DELETE_BY_NAME);
+        $query = self::DELETE_BY_NAME;
+        $query_params = array( ':username' => $username); 
+        try { 
+            $stmt = $this->pdo->prepare($query);
+            $result = $stmt->execute($query_params); 
 
-        return $query->execute(array($username));
+            if ( $result ) {
+                return 1;
+            }
+            
+        } 
+        catch(PDOException $ex){ die("Failed to run query: " . $ex->getMessage()); } 
+
+
+        /*
+        return $this->pdo->exec(
+            sprintf(self::DELETE_BY_NAME, $username)
+        );
+        */
     }
 
-    public function setIsDoctorByUsername($username, $isDoctor)
+    public function setDocByUsername($username)
     {
-        $user = $this->findByUser($username);
-        $user->setIsDoctor($isDoctor);
-        if($this->saveExistingUser($user)){
+        $query = self::UPDATE_ROLE_QUERY;
+        $query_params = array(':role' => 2, ':user' => $username); 
+        try { 
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($query_params); 
             return 1;
-        }else{
-            return false;
-        }
+        } 
+        catch(PDOException $ex){ die("Failed to run query: " . $ex->getMessage()); } 
     }
+
+    public function removeDocByUsername($username)
+    {
+        $query = self::UPDATE_ROLE_QUERY;
+        $query_params = array(':role' => 0, ':user' => $username); 
+        try { 
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($query_params); 
+            return 1;
+        } 
+        catch(PDOException $ex){ die("Failed to run query: " . $ex->getMessage()); } 
+    }
+
 
 
     public function all()
     {
-        $rows = $this->db->query(self::SELECT_ALL);
+        $rows = $this->pdo->query(self::SELECT_ALL);
         
         if ($rows === false) {
             return [];
@@ -121,69 +258,36 @@ class UserRepository
         $this->saveExistingUser($user);
     }
 
+
+    // VASKAD
     public function saveNewUser(User $user)
     {
+        $query = self::INSERT_QUERY;
+        $query_params = array( ':username' => $user->getUsername(), ':password' => $user->getHash(), ':email' => $user->getEmail(), ':age' => $user->getAge(), ':bio' => $user->getBio(), ':role' => $user->isAdmin(), ':fullname' => $user->getFullname(), ':address' => $user->getAddress(), ':postcode' => $user->getPostcode(), ':bankcard' => $user->getBankCard()); 
 
-        $query = $this->db->prepare(self::INSERT_QUERY);
-
-        return $query->execute(array(
-            $user->getUsername(), $user->getHash(), $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->isDoctor(), $user->getBanknumber(), $user->getFullname(), $user->getAddress(), $user->getPostcode()
-        ));
+        try { 
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($query_params); 
+            return 1;
+        } 
+        catch(PDOException $ex){ die("Failed to run query: " . $ex->getMessage()); } 
+     
     }
 
+
+    // VASKAD
     public function saveExistingUser(User $user)
     {
-        $query = $this->db->prepare(self::UPDATE_QUERY);
+        $query = self::UPDATE_QUERY;
+        $query_params = array(':email' => $user->getEmail(), ':age' => $user->getAge(), ':bio' => $user->getBio(), ':role' => $user->isAdmin(), ':fullname' => $user->getFullname(), ':address' => $user->getAddress(), ':postcode' => $user->getPostcode(), ':id' => $user->getUserId(), ':bankcard' => $user->getBankCard()); 
+        try { 
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($query_params); 
+            return 1;
+        } 
+        catch(PDOException $ex){ die("Failed to run query: " . $ex->getMessage()); } 
 
-        return $query->execute(array(
-            $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->isDoctor(), $user->getBanknumber(), $user->getFullname(), $user->getAddress(), $user->getPostcode(), $user->getUserId()
-        ));
-    }
-    
-    //find how much doctor has earned
-    public function getEarned($username)
-    {
-        $query = "SELECT count(*)
-                  FROM posts
-                  WHERE posts.answered == '$username'";
-        $result = $this->db->prepare($query);
-        $result->execute();
-        $num_of_rows = $result->fetchColumn();
-        
-        $earned = $num_of_rows * 7;
-        return $earned;
-    }
-    
-    //find how much user has spent
-    public function getSpent($username)
-    {
-        $query = "SELECT count(*)
-                  FROM posts
-                  WHERE posts.author == '$username'
-                  AND posts.cost == 1";
-
-        $results = $this->db->prepare($query);
-        $results->execute();
-        $num_of_rows = $results->fetchColumn();
-
-        $spent = $num_of_rows * 10;
-        return $spent;
+     
     }
 
-    public function getCompanyEarned()
-    {
-        $q1 = "SELECT count(*)
-               FROM posts
-               WHERE posts.cost == 1
-               AND posts.answered != ''";
-
-
-        $threeDollars = $this->db->prepare($q1);
-        $threeDollars->execute();
-        $num_of_rows3 = $threeDollars->fetchColumn();
-
-        $earned = ($num_of_rows3 * 3);
-
-        return $earned;
-    }
 }

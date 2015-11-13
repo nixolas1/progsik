@@ -4,22 +4,23 @@
 
     <h2>Create post</h2>
 
-    <form action="" method="POST" autocomplete="off">
-        <div id="flasherror">{{ flash.error }}</div>
+    <form action="" method="POST">
+        <div id="flasherror">{{ flash.error|raw }}</div>
 
         <label>Title:</label>
-        <input type = "text" name="title">
-        {% if isPaying %}
-        <label>Paying:</label>
-        <input type="checkbox" name="cost" value="1"> <br />
-        {% endif %}
+        <input type = "text" name="title"> <br />
 
         <label>Text:</label>
-        <textarea cols="40" rows="10" name="content"> </textarea><br />
+        <textarea cols="40" rows="10" name="content"></textarea><br />
 
-        <label>Author: <b>{{username}}</b></label>
-        <br>
-        <input type="hidden" name="token" value="{{token}}">
+       	{% if hasPaid == true %}
+	        <input type="hidden" name="paydoc" value="0" />
+			<input type="checkbox" name="paydoc" value="1" /> I want a doctor to answer this post<br>
+		{% else %}
+        	<p> If you want doctors to see your post, please add a bankcard number to your profile. </p>
+		{% endif %}
+
+        <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
         <input type="submit" name="submit" value="Create post">
     </form>
 {% endblock %}

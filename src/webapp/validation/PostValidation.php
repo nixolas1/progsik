@@ -26,14 +26,21 @@ class PostValidation {
     {
         if ($author == null) {
             $this->validationErrors[] = "Author needed";
-
         }
+
         if ($title == null) {
             $this->validationErrors[] = "Title needed";
         }
+        elseif(strlen($title) > 250){
+            $this->validationErrors[] = "The title cannot be longer than 250 characters";
+        }
 
-        if ($content == null) {
+
+        if (empty($content)) {
             $this->validationErrors[] = "Text needed";
+        }
+        elseif(strlen($content) > 20000){
+            $this->validationErrors[] = "Content cannot be more than 20 000 characters.";
         }
 
         return $this->validationErrors;

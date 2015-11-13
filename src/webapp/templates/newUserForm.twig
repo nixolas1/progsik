@@ -4,12 +4,10 @@
 
 <h2>New user</h2>
 
-<b>{{ flash.info }}</b> <br />
-<b>{% for err in flash.error %}
-        {{ err }}<br />
-    {% endfor %}</b> <br />
+<b>{{ flash.info}}</b> <br />
+<b>{{ flash.error|raw }}</b> <br />
 
-<form action="" method="POST" autocomplete="off">
+<form action="" method="POST">
 
     <label>Username: </label>
     <input type="text" name="user" value="{{ username }}"> <br />
@@ -21,6 +19,7 @@
     <input type ="text" name = "address"><br/>
     <label> Postcode (Only four digits please)</label>
     <input type = "text" name = "postcode"><br/>
+    <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
     <input type="submit" name="submit" value="Create new user"> <br/>
 
 </form>

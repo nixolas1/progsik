@@ -76,41 +76,42 @@ class Auth
     public function isAdmin()
     {
         if ($this->check()) {
-            $user = $this->user();
-            if ($user != false) {
-                return $user->isAdmin();
-            }
-            return false;
+            return $this->user()->isAdmin();
         }
 
         throw new Exception('Not logged in but called Auth::isAdmin() anyway');
     }
-    
-    public function isPaying()
+
+    public function isDoc()
     {
         if ($this->check()) {
-            $user = $this->user();
-            if ($user != false) {
-                return $user->isPaying();
-            }
-            return false;
+            return $this->user()->isDoc();
         }
+
+        throw new Exception('Not logged in but called Auth::isDoc() anyway');
     }
 
-    public function isDoctor()
+    public function hasPaid()
     {
-        if ($this->check()) {
-            $user = $this->user();
-            if ($user != false) {
-                return $user->isDoctor();
-            }
+        $test = $this->userRepository->checkBankCard($_SESSION['user']);
+        if ($test) {
+            return true;
+        }
+        else{
             return false;
         }
+
     }
+
+
 
     public function logout()
     {
-        session_destroy();
+        if(isset($_SESSION['user'])) {
+            session_destroy();
+        }
+
+
     }
 
 }

@@ -17,18 +17,14 @@
             <td>{{ user.username }}</th>
             <tr></tr>
             <th>Bio:</th>
-            <td>{{ user.bio}}</td>
+            <td>{{ user.bio }}</td>
             <tr></tr>
             <th>Age:</th>
             <td>{{ user.age }}</td>
             <tr></tr>
-
-
-
-
     </table>
 {% else %}
-    Could not find a user with username "{{ username }}".
+    Could not find a user with username "{{ username}}".
 {% endif %}
 
 {% endblock %}
